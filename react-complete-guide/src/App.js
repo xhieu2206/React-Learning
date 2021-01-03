@@ -9,7 +9,8 @@ class App extends Component {
       { name: 'Max', age: 30 },
       { name: 'Quân', age: 31 },
     ],
-    otherState: 'Some other state'
+    otherState: 'Some other state',
+    showPersons: false
   }
 
   switchNameHandler = (newName) => { // arrow function để lexical con trỏ this
@@ -33,6 +34,12 @@ class App extends Component {
     });
   }
 
+  togglePersonsHandler = () => { // luôn dùng syntax này nếu như chúng ta có ý định sử dụng THIS keyword
+    this.setState({
+      showPersons: !this.state.showPersons // toggle giá trị của showPersons
+    })
+  }
+
   // () => this.switchNameHandler() sẽ là () => { return this.switchNameHandler() }, return ra một function call
   render() {
     // không dùng được một số style như cursor trong inline CSS như thế này.
@@ -50,24 +57,28 @@ class App extends Component {
         <h1>Hello Xuân Hiếu</h1>
         <button
           style={style}
-          onClick={() => this.switchNameHandler('Nguyễn Xuân Hiếu')}>
-            Switch Name
+          onClick={this.togglePersonsHandler}>
+            Toggle
         </button>
-        <Person
-          name={this.state.persons[0].name}
-          age={this.state.persons[0].age} 
-        />
-        <Person
-          name={this.state.persons[1].name}
-          age={this.state.persons[1].age}
-          clickName={this.switchNameHandler.bind(this, 'Maximilian')}
-          changeName={this.nameChangedHandler}>
-            My hobbies: Racing
-        </Person>
-        <Person
-          name={this.state.persons[2].name}
-          age={this.state.persons[2].age} >
-        </Person>
+        { this.state.showPersons ?
+          <div>
+            <Person
+              name={this.state.persons[0].name}
+              age={this.state.persons[0].age} 
+            />
+            <Person
+              name={this.state.persons[1].name}
+              age={this.state.persons[1].age}
+              clickName={this.switchNameHandler.bind(this, 'Maximilian')}
+              changeName={this.nameChangedHandler}>
+                My hobbies: Racing
+            </Person>
+            <Person
+              name={this.state.persons[2].name}
+              age={this.state.persons[2].age} >
+            </Person>
+          </div> : null
+        }
       </div>
     );
   }
