@@ -5,32 +5,30 @@ import Person from './Person/Person';
 class App extends Component {
   state = {
     persons: [
-      { name: 'Xuân Hiếu', age: 26 },
-      { name: 'Max', age: 30 },
-      { name: 'Quân', age: 31 },
+      { id: 'adad1', name: 'Xuân Hiếu', age: 26 },
+      { id: 'aeae2', name: 'Max', age: 30 },
+      { id: 'atat3', name: 'Quân', age: 31 },
     ],
     otherState: 'Some other state',
     showPersons: false
   }
 
-  switchNameHandler = (newName) => { // arrow function để lexical con trỏ this
-    // DONT DO THIS: this.state.persons[0].name = 'Nguyễn Xuân Hiếu'; // React sẽ không render lại DOM nó "không biết" rằng chúng ta đã thay đổi state của component
+  deletePersonHandler = index => {
+    const persons = this.state.persons.slice(); // const persons = [...this.state.persons]
+    persons.splice(index, 1);
     this.setState({
-      persons: [
-        { name: newName, age: 26 },
-        { name: 'Max', age: 30 },
-        { name: 'Quân', age: 31 },
-      ]
+      persons: persons
     })
   }
 
-  nameChangedHandler = event => { // event sẽ được passed một các tự động bởi React như là normal js
+  nameChangedHandler = (event, id) => { // event sẽ được passed một các tự động bởi React như là normal js
+    const personIndex = this.state.persons.findIndex(p => p.id === id);
+    const person = {...this.state.persons[personIndex]};
+    person.name = event.target.value;
+    const persons = [...this.state.persons];
+    persons[personIndex] = person
     this.setState({
-      persons: [
-        { name: 'Xuân Hiếu', age: 26 },
-        { name: event.target.value, age: 30 },
-        { name: 'Quân', age: 31 },
-      ]
+      persons: persons
     });
   }
 
@@ -52,6 +50,24 @@ class App extends Component {
       cursor: 'pointer'
     }
 
+    let persons = null;
+
+    if (this.state.showPersons) {
+      persons = (
+        <div>
+          {this.state.persons.map((person, index) => {
+            return <Person
+              name={person.name}
+              age={person.age}
+              clickName={() => this.deletePersonHandler(index)} // có thể dùng bind, phải cùng tên với tên attribute của Person component
+              key={person.id}
+              changeName={(event) => this.nameChangedHandler(event, person.id)} // phải cùng tên với tên attribute của Person component
+            />
+          })}
+        </div>
+      )
+    }
+
     return (
       <div className="App">
         <h1>Hello Xuân Hiếu</h1>
@@ -60,25 +76,7 @@ class App extends Component {
           onClick={this.togglePersonsHandler}>
             Toggle
         </button>
-        { this.state.showPersons ?
-          <div>
-            <Person
-              name={this.state.persons[0].name}
-              age={this.state.persons[0].age} 
-            />
-            <Person
-              name={this.state.persons[1].name}
-              age={this.state.persons[1].age}
-              clickName={this.switchNameHandler.bind(this, 'Maximilian')}
-              changeName={this.nameChangedHandler}>
-                My hobbies: Racing
-            </Person>
-            <Person
-              name={this.state.persons[2].name}
-              age={this.state.persons[2].age} >
-            </Person>
-          </div> : null
-        }
+        {persons}
       </div>
     );
   }
