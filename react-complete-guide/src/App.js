@@ -1,22 +1,7 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
 
-import './App.css';
+import classesStyles from './App.css';
 import Person from './Person/Person';
-
-const StyledButton = styled.button`
-  background-color: ${props => props.alt ? 'red' : 'green'};
-  color: white;
-  font: inherit;
-  border: 1px solid blue;
-  padding: 8px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${props => props.alt ? 'salmon' : 'lightgreen'};
-    color: black;
-  }
-`;
 
 class App extends Component {
   state = {
@@ -74,6 +59,7 @@ class App extends Component {
     */
 
     let persons = null;
+    let btnClass = [classesStyles.Button];
 
     if (this.state.showPersons) {
       persons = (
@@ -90,6 +76,8 @@ class App extends Component {
         </div>
       )
 
+      btnClass.push(classesStyles.Red);
+
       /*
       style.backgroundColor = 'red';
       style[':hover'] = { // sau tất cả, đây sẽ được convert thành JS, có thể coi ':hover' ở đây là một property
@@ -101,22 +89,22 @@ class App extends Component {
 
     const classes = [];
     if (this.state.persons.length <= 2) {
-      classes.push('red'); // red
+      classes.push(classesStyles.red); // red
     }
     if (this.state.persons.length <= 1) {
-      classes.push('bold'); // red & bold
+      classes.push(classesStyles.bold); // red & bold
     }
 
     return (
-      <div className="App">
+      <div className={classesStyles.App}>
         <h1>Hello</h1>
         <p className={classes.join(' ')}>It worked</p>
-        <StyledButton
-          alt={this.state.showPersons} // passed state của app component vào props của StyledButton component
+        <button
+          className={btnClass.join(' ')}
           onClick={this.togglePersonsHandler}
         >
-            Toggle
-        </StyledButton>
+          Toggle
+        </button>
         {persons}
       </div>
     );
