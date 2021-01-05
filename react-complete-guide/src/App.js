@@ -1,8 +1,22 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
+
 import './App.css';
 import Person from './Person/Person';
 
-import Radium, { StyleRoot } from 'radium';
+const StyledButton = styled.button`
+  background-color: ${props => props.alt ? 'red' : 'green'};
+  color: white;
+  font: inherit;
+  border: 1px solid blue;
+  padding: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${props => props.alt ? 'salmon' : 'lightgreen'};
+    color: black;
+  }
+`;
 
 class App extends Component {
   state = {
@@ -44,6 +58,7 @@ class App extends Component {
   render() {
     // không dùng được một số style như cursor trong inline CSS như thế này.
     // style này sẽ được applied với scope là chỉ component này thôi.
+    /*
     const style = {
       backgroundColor: 'green',
       color: 'white',
@@ -56,6 +71,7 @@ class App extends Component {
         color: 'black'
       }
     }
+    */
 
     let persons = null;
 
@@ -74,11 +90,13 @@ class App extends Component {
         </div>
       )
 
+      /*
       style.backgroundColor = 'red';
       style[':hover'] = { // sau tất cả, đây sẽ được convert thành JS, có thể coi ':hover' ở đây là một property
         backgroundColor: 'salmon',
         color: 'black'
       }
+      */
     }
 
     const classes = [];
@@ -90,18 +108,17 @@ class App extends Component {
     }
 
     return (
-      <StyleRoot>
-        <div className="App">
-          <h1>Hello</h1>
-          <p className={classes.join(' ')}>It worked</p>
-          <button
-            style={style}
-            onClick={this.togglePersonsHandler}>
-              Toggle
-          </button>
-          {persons}
-        </div>
-      </StyleRoot>
+      <div className="App">
+        <h1>Hello</h1>
+        <p className={classes.join(' ')}>It worked</p>
+        <StyledButton
+          alt={this.state.showPersons} // passed state của app component vào props của StyledButton component
+          onClick={this.togglePersonsHandler}
+        >
+            Toggle
+        </StyledButton>
+        {persons}
+      </div>
     );
   }
 }
