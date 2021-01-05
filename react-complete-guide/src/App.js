@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 import Person from './Person/Person';
 
+import Radium, { StyleRoot } from 'radium';
+
 class App extends Component {
   state = {
     persons: [
@@ -18,7 +20,7 @@ class App extends Component {
     persons.splice(index, 1);
     this.setState({
       persons: persons
-    })
+    });
   }
 
   nameChangedHandler = (event, id) => { // event sẽ được passed một các tự động bởi React như là normal js
@@ -43,11 +45,16 @@ class App extends Component {
     // không dùng được một số style như cursor trong inline CSS như thế này.
     // style này sẽ được applied với scope là chỉ component này thôi.
     const style = {
-      backgroundColor: 'white',
+      backgroundColor: 'green',
+      color: 'white',
       font: 'inherit',
       border: '1px solid blue',
       padding: '8px',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      ':hover': { // sau tất cả, đây sẽ được convert thành JS, có thể coi ':hover' ở đây là một property
+        backgroundColor: 'lightgreen',
+        color: 'black'
+      }
     }
 
     let persons = null;
@@ -66,20 +73,37 @@ class App extends Component {
           })}
         </div>
       )
+
+      style.backgroundColor = 'red';
+      style[':hover'] = { // sau tất cả, đây sẽ được convert thành JS, có thể coi ':hover' ở đây là một property
+        backgroundColor: 'salmon',
+        color: 'black'
+      }
+    }
+
+    const classes = [];
+    if (this.state.persons.length <= 2) {
+      classes.push('red'); // red
+    }
+    if (this.state.persons.length <= 1) {
+      classes.push('bold'); // red & bold
     }
 
     return (
-      <div className="App">
-        <h1>Hello Xuân Hiếu</h1>
-        <button
-          style={style}
-          onClick={this.togglePersonsHandler}>
-            Toggle
-        </button>
-        {persons}
-      </div>
+      <StyleRoot>
+        <div className="App">
+          <h1>Hello</h1>
+          <p className={classes.join(' ')}>It worked</p>
+          <button
+            style={style}
+            onClick={this.togglePersonsHandler}>
+              Toggle
+          </button>
+          {persons}
+        </div>
+      </StyleRoot>
     );
   }
 }
 
-export default App;
+export default App; // higher order component, có thể coi như là một component wrapping lấy một component khác, có thể dùng ở cả class-based component hay functional component
