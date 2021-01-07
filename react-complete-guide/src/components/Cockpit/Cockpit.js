@@ -1,25 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 
 import classesStyles from './Cockpit.css';
+import AuthContext from '../../context/auth-context';
 
 const cockpit = props => {
-  /*
-  useEffect(() => {
-    console.log('[Cockpit.js] useEffect');
-    // HTTP request ...
-    setTimeout(() => {
-      alert('Saved data to cloud');
-    }, 1000);
-  }, [props.persons]); // chỉ được executed khi mà props.persons thay đổi. Giả sử khi chúng ta changed input hay delete một item ...
-  */
+  const toggleBtnRef = useRef(null); // create a ref đến element
+  const authContext = useContext(AuthContext); // React sẽ make connection behind the scenes
 
   useEffect(() => {
     console.log('[Cockpit.js] useEffect');
-
-    // HTTP request ...
-    setTimeout(() => {
-      alert('Saved data to cloud in the first time rendered'); // fake
-    }, 1000);
+    toggleBtnRef.current.click();
 
     return () => { // function này sẽ được run khi component bị removed, tương đương với hook componentWillUnmount của class-based component
       // clearTimeout(timer); // clear timeout để chỉ hiển thị alert khi render
@@ -55,10 +45,15 @@ const cockpit = props => {
       <h1>{props.title}</h1>
       <p className={classes.join(' ')}>It worked</p>
       <button
+        ref={toggleBtnRef} // trỏ element đến ref item
         className={btnClass}
         onClick={props.clicked}
       >
         Toggle
+      </button>
+
+      <button onClick={authContext.login}>
+        Login
       </button>
     </div>
   )
