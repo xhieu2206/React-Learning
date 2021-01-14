@@ -16,3 +16,14 @@
 .Toolbar nav {
   height: 100%;
 }
+
+.Logo {
+  height: 80%;
+}
+
+/* Hiding the toolbar when using mobile screen */
+@media (max-width: 499px) {
+  .DesktopOnly {
+    display: none;
+  }
+}
