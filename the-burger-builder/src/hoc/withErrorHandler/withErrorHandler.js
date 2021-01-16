@@ -5,39 +5,28 @@ import Aux from '../Auxiliary/Auxiliary';
 
 const withErrorHandler = (WrappedComponent, axios) => {
   return class extends React.Component {
-    // constructor(props) {
-    //   super(props);
-    //   axios.interceptors.request.use(request => { // nếu không có lỗi thì set lại giá trị của error = null
-    //     this.setState({
-    //       error: null
-    //     });
-    //     return request;
-    //   });
-
-    //   axios.interceptors.response.use(res => res, error => {
-    //     this.setState({
-    //       error: error
-    //     });
-    //   })
-    // }
-
     state = {
       error: null
     }
 
-    componentDidMount() {
-      axios.interceptors.request.use(request => { // nếu không có lỗi thì set lại giá trị của error = null
+    componentWillMount() {
+      this.reqInterceptor = axios.interceptors.request.use(request => { // nếu không có lỗi thì set lại giá trị của error = null
         this.setState({
           error: null
         });
         return request;
       });
 
-      axios.interceptors.response.use(res => res, error => {
+      this.resInterceptor = axios.interceptors.response.use(res => res, error => {
         this.setState({
           error: error
         });
       });
+    }
+
+    componentWillUnmount() {
+      axios.interceptors.request.eject(this.reqInterceptor);
+      axios.interceptors.response.eject(this.resInterceptor);
     }
 
     errorConfirmedHandler = () => {
