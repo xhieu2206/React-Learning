@@ -1,76 +1,58 @@
 import React, { Component } from "react";
-import axios from "axios";
+import { Route, NavLink } from 'react-router-dom';
 
-import Post from "../../components/Post/Post";
-import FullPost from "../../components/FullPost/FullPost";
-import NewPost from "../../components/NewPost/NewPost";
+import Posts from './Posts/Posts';
+import NewPost from './NewPost/NewPost';
+
 import "./Blog.css";
 
 class Blog extends Component {
-	state = {
-		posts: [],
-		selectedPostId: null,
-		error: false
-	}
-
-	postSelectedHandler = id => {
-		this.setState({
-			selectedPostId: id
-		});
-	}
-
-  async componentDidMount() {
-		// https://jsonplaceholder.typicode.com/posts
-		try {
-			const { data } = await axios.get('/posts'); // throw error in here
-			const posts = data.slice(0, 4);
-			const updatedPosts = posts.map(post => {
-				return {
-					...post,
-					author: 'Xuân Hiếu' // tạm thời hardcode giá trị của author
-				}
-			});
-			this.setState({
-				posts: updatedPosts,
-				error: false
-			});
-		} catch(e) {
-			this.setState({
-				error: true
-			});
-		}
-	}
-
-  render() {
-		let posts;
-		if (this.state.error) {
-			posts = <p>Something went wrong!!!</p>
-		} else {
-			posts = this.state.posts.map(post => {
-				return (
-					<Post
-						title={post.title}
-						userId={post.author}
-						key={post.id}
-						clicked={() => this.postSelectedHandler(post.id)}
-					/>
-				);
-			});
-		};
-
-    return (
-      <div>
-        <section className="Posts">
-          {posts}
-        </section>
-        <section>
-          <FullPost
-						id={this.state.selectedPostId}
-					/>
-        </section>
-        <section>
-          <NewPost />
-        </section>
+	render() {
+		console.log(this.props)
+		return (
+      <div className="Blog">
+				<header>
+					<nav>
+						<ul>
+							<li>
+								<NavLink
+								to="/"
+								activeClassName="my-active"
+								activeStyle={{
+									color: '#FA923F',
+									textDecoration: 'underline'
+								}}
+								exact>
+									Home
+								</NavLink>
+							</li>
+							<li>
+								<NavLink
+								activeClassName="active"
+								activeStyle={{
+									textDecoration: 'underline'
+								}}
+								to={{
+									pathname: '/new-post',
+									hash: '#submit',
+									search: '?quick-submit=true'
+								}}>
+									New Post
+								</NavLink>
+							</li>
+						</ul>
+					</nav>
+				</header>
+				<Route
+					path="/" // tell react về path mà chúng ta muốn apply JSX ở render
+					exact // xác nhận đây path phải exact với path attribute.
+					component={Posts} // 1 reference đến function hoặc class mà chúng ta muốn render
+				/>
+				<Route
+					path="/new-post" // tell react về path mà chúng ta muốn apply JSX ở render
+					exact // xác nhận đây path phải exact với path attribute.
+					component={NewPost} // 1 reference đến function hoặc class mà chúng ta muốn render
+				/>
       </div>
     );
   }
