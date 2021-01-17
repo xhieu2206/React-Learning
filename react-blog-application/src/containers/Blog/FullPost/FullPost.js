@@ -10,10 +10,11 @@ class FullPost extends Component {
 		id: null
 	}
 
-	async componentDidUpdate() {
+	async componentDidMount() {
+		const postId = this.props.match.params.id;
 		// https://jsonplaceholder.typicode.com/posts/1
-		if (this.props.id && this.state.id !== this.props.id) { // check nếu như chúng ta GET post lần đầu tiên thì mới call HTTP request
-			const { data } = await axios.get(`/posts/${this.props.id}`);
+		if (postId) { // không cần check gì vì component được mount lại chứ không phải get updated
+			const { data } = await axios.get(`/posts/${postId}`);
 			this.setState({
 				title: data.title,
 				body: data.body,
@@ -30,7 +31,7 @@ class FullPost extends Component {
 
   render() {
     let post = <p style={{ textAlign: "center", color: 'red' }}>Please select a Post!</p>;
-    if (this.props.id) {
+    if (this.props.match.params.id) {
 			post = (
 				<div className="FullPost">
 					<h1>{this.state.title}</h1>

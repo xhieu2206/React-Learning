@@ -1,9 +1,11 @@
 import React from 'react';
 import axios from 'axios';
+import { Route } from 'react-router-dom'
 
 import './Posts.css'; // chúng ta không dùng CSS module trong app này
 
 import Post from '../../../components/Post/Post';
+import FullPost from '../FullPost/FullPost';
 
 class Posts extends React.Component {
 	state = {
@@ -30,8 +32,8 @@ class Posts extends React.Component {
 	}
 
   postSelectedHandler = id => {
-		this.setState({
-			selectedPostId: id
+		this.props.history.push({
+			pathname: '/posts/' + id
 		});
 	}
 
@@ -45,17 +47,20 @@ class Posts extends React.Component {
 					<Post
 						title={post.title}
 						userId={post.author}
-						key={post.id}
 						clicked={() => this.postSelectedHandler(post.id)}
+						key={post.id}
 					/>
 				);
 			});
 		};
 
     return(
-      <section className="Posts">
-        {posts}
-      </section>
+			<div>
+				<section className="Posts">
+					{posts}
+				</section>
+				<Route path={this.props.match.url + '/:id'} exact component={FullPost} />
+			</div>
     )
   }
 }

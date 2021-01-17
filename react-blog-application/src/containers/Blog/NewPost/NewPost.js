@@ -10,10 +10,6 @@ class NewPost extends Component {
     author: "Max",
   };
 
-  componentDidMount() {
-    console.log(this.props);
-  }
-
   postDataHandler = async () => {
 		// POST https://jsonplaceholder.typicode.com/posts
 		const post = {

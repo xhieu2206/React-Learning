@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, NavLink } from 'react-router-dom';
+import { Route, NavLink, Switch } from 'react-router-dom';
 
 import Posts from './Posts/Posts';
 import NewPost from './NewPost/NewPost';
@@ -8,7 +8,6 @@ import "./Blog.css";
 
 class Blog extends Component {
 	render() {
-		console.log(this.props)
 		return (
       <div className="Blog">
 				<header>
@@ -16,14 +15,14 @@ class Blog extends Component {
 						<ul>
 							<li>
 								<NavLink
-								to="/"
+								to="/posts"
 								activeClassName="my-active"
 								activeStyle={{
 									color: '#FA923F',
 									textDecoration: 'underline'
 								}}
 								exact>
-									Home
+									Posts
 								</NavLink>
 							</li>
 							<li>
@@ -43,16 +42,16 @@ class Blog extends Component {
 						</ul>
 					</nav>
 				</header>
-				<Route
-					path="/" // tell react về path mà chúng ta muốn apply JSX ở render
-					exact // xác nhận đây path phải exact với path attribute.
-					component={Posts} // 1 reference đến function hoặc class mà chúng ta muốn render
-				/>
-				<Route
-					path="/new-post" // tell react về path mà chúng ta muốn apply JSX ở render
-					exact // xác nhận đây path phải exact với path attribute.
-					component={NewPost} // 1 reference đến function hoặc class mà chúng ta muốn render
-				/>
+				<Switch>
+					<Route
+						path="/new-post" // tell react về path mà chúng ta muốn apply JSX ở render
+						component={NewPost} // 1 reference đến function hoặc class mà chúng ta muốn render
+					/>
+					<Route
+						path="/posts" // tell react về path mà chúng ta muốn apply JSX ở render
+						component={Posts} // 1 reference đến function hoặc class mà chúng ta muốn render
+					/>
+				</Switch>
       </div>
     );
   }

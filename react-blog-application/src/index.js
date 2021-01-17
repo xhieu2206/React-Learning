@@ -12,7 +12,7 @@ axios.interceptors.request.use(request => {
   // Edit request config if needed
   return request;
 }, err => {
-  console.log(err);
+  console.log('This is the error from request: ', err);
   return Promise.reject(err);
 });
 
@@ -20,7 +20,7 @@ axios.interceptors.response.use(response => {
   // console.log(response);
   return response;
 }, err => {
-  console.log(err);
+  console.log('This is the error from response: ', err);
   return Promise.reject(err);
 });
 
