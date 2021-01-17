@@ -7,7 +7,7 @@ class NewPost extends Component {
   state = {
     title: "",
     content: "",
-    author: "Max",
+    author: "Xuân Hiếu"
   };
 
   postDataHandler = async () => {
@@ -17,7 +17,9 @@ class NewPost extends Component {
 			body: this.state.content,
 			author: this.state.author
 		}
-		const {data} = await axios.post('/posts', post);
+    const {data} = await axios.post('/posts', post);
+    // this.props.history.push('/posts');
+    this.props.history.replace('/posts');
 		console.log(data);
 	};
 
@@ -42,8 +44,8 @@ class NewPost extends Component {
           value={this.state.author}
           onChange={(event) => this.setState({ author: event.target.value })}
         >
+          <option value="Xuân Hiếu">Xuân Hiếu</option>
           <option value="Max">Max</option>
-          <option value="Manu">Manu</option>
         </select>
         <button onClick={this.postDataHandler}>Add Post</button>
       </div>

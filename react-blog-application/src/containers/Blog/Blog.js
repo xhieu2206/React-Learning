@@ -1,12 +1,20 @@
 import React, { Component } from "react";
-import { Route, NavLink, Switch } from 'react-router-dom';
+import { Route, NavLink, Switch, Redirect } from 'react-router-dom';
 
 import Posts from './Posts/Posts';
-import NewPost from './NewPost/NewPost';
-
 import "./Blog.css";
 
+// import NewPost from './NewPost/NewPost';
+import asyncComponent from '../../hoc/asyncComponent';
+const AsyncNewPost = asyncComponent(() => {
+	return import('./NewPost/NewPost');
+});
+
 class Blog extends Component {
+	state = {
+		auth: true
+	}
+
 	render() {
 		return (
       <div className="Blog">
@@ -43,14 +51,16 @@ class Blog extends Component {
 					</nav>
 				</header>
 				<Switch>
-					<Route
+					{this.state.auth ? <Route
 						path="/new-post" // tell react về path mà chúng ta muốn apply JSX ở render
-						component={NewPost} // 1 reference đến function hoặc class mà chúng ta muốn render
-					/>
+						component={AsyncNewPost} // async import component
+					/> : null}
 					<Route
 						path="/posts" // tell react về path mà chúng ta muốn apply JSX ở render
 						component={Posts} // 1 reference đến function hoặc class mà chúng ta muốn render
 					/>
+					{/* <Route render={() => <h1>Not Found Page</h1>} /> */}
+					<Redirect from="/" to="/posts" />
 				</Switch>
       </div>
     );

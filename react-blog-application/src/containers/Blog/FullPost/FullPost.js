@@ -11,9 +11,17 @@ class FullPost extends Component {
 	}
 
 	async componentDidMount() {
+		await this.loadData();
+	}
+
+	async componentDidUpdate() {
+		await this.loadData();
+	}
+
+	async loadData() {
 		const postId = this.props.match.params.id;
 		// https://jsonplaceholder.typicode.com/posts/1
-		if (postId) { // không cần check gì vì component được mount lại chứ không phải get updated
+		if (postId && this.state.id !== parseInt(postId, 10)) { // check nếu param id trên route thay đổi để avoid infinite loop
 			const { data } = await axios.get(`/posts/${postId}`);
 			this.setState({
 				title: data.title,
@@ -22,6 +30,7 @@ class FullPost extends Component {
 			});
 		}
 	}
+
 
 	deletePostHandler = async () => {
 		// DELETE https://jsonplaceholder.typicode.com/posts/${id}
