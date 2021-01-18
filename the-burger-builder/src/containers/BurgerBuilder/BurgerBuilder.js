@@ -87,39 +87,42 @@ class BurgerBuilder extends React.Component {
     this.setState({ purchasing: false });
   }
 
-  purchaseContinueHandler = () => {
-    this.setState({
-      loading: true
-    });
+  purchaseContinueHandler = () => { // tạm commnet-out code cũ vì chúng ta sẽ không handle việc sending order ở đây
+    // this.setState({
+    //   loading: true
+    // });
 
-    const order = {
-      ingredients: this.state.ingredients,
-      price: this.state.totalPrice,
-      customer: {
-        name: 'xhieu2206',
-        address: {
-          street: 'Hanoi',
-          zipCode: '100000',
-          country: 'Vietnam'
-        },
-        email: 'xhieu04@gmail.com'
-      },
-      deliveryMethod: 'fastest'
-    }
+    // const order = {
+    //   ingredients: this.state.ingredients,
+    //   price: this.state.totalPrice,
+    //   customer: {
+    //     name: 'xhieu2206',
+    //     address: {
+    //       street: 'Hanoi',
+    //       zipCode: '100000',
+    //       country: 'Vietnam'
+    //     },
+    //     email: 'xhieu04@gmail.com'
+    //   },
+    //   deliveryMethod: 'fastest'
+    // }
 
-    axios.post('/orders.json', order)
-      .then(_ => {
-        this.setState({
-          loading: false,
-          purchasing: false
-        });
-      })
-      .catch(_ => {
-        this.setState({
-          loading: false,
-          purchasing: false
-        })
-      });
+    // axios.post('/orders.json', order)
+    //   .then(_ => {
+    //     this.setState({
+    //       loading: false,
+    //       purchasing: false
+    //     });
+    //   })
+    //   .catch(_ => {
+    //     this.setState({
+    //       loading: false,
+    //       purchasing: false
+    //     })
+    //   });
+    this.props.history.push({
+      pathname: '/checkout'
+    })
   }
 
   render() {
