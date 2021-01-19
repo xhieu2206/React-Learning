@@ -85,9 +85,12 @@ class ContactData extends React.Component {
           ],
           placeholder: 'Delivery Method:'
         },
-        value: ''
+        value: 'fastest',
+        validation: {}, // luôn luôn không có validation
+        valid: true // luôn luôn là true vì chúng ta không có validation cho dropdown
       }
     },
+    formIsValid: false, // check xem form đã valid chưa
     loading: false
   }
 
@@ -147,9 +150,15 @@ class ContactData extends React.Component {
     orderForm[key].value = e.target.value;
     orderForm[key].valid = this.checkValidity(e.target.value, orderForm[key].validation);
     orderForm[key].touched = true; // nếu input đã được thay đổi, toggle touch props value
-    console.log(orderForm);
+
+    let formIsValid = true;
+    for (let key in orderForm) {
+      if (!orderForm[key].valid) formIsValid = false;
+    }
+
     this.setState({
-      orderForm: orderForm
+      orderForm: orderForm,
+      formIsValid: formIsValid
     });
   }
 
@@ -178,7 +187,12 @@ class ContactData extends React.Component {
               changed={(e) => this.inputChangedHandler(e, formElement.id)}
             />
           })}
-          <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+          <Button
+            disabled={!this.state.formIsValid} // disabled custom Button component tương ứng với props.disabled
+            btnType="Success"
+            clicked={this.orderHandler}>
+              ORDER
+          </Button>
         </form>
         ) : <Spinner />}
       </div>
