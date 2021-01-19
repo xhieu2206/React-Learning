@@ -19,7 +19,8 @@ class ContactData extends React.Component {
         validation: {
           required: true
         },
-        valid: false
+        valid: false,
+        touched: false // tương tự với các field có validation khác
       },
       email: {
         elementType: 'input',
@@ -31,7 +32,8 @@ class ContactData extends React.Component {
         validation: {
           required: true
         },
-        valid: false
+        valid: false,
+        touched: false
       },
       country: {
         elementType: 'input',
@@ -43,7 +45,8 @@ class ContactData extends React.Component {
         validation: {
           required: true
         },
-        valid: false
+        valid: false,
+        touched: false
       },
       street: {
         elementType: 'input',
@@ -55,7 +58,8 @@ class ContactData extends React.Component {
         validation: {
           required: true
         },
-        valid: false
+        valid: false,
+        touched: false
       },
       zipCode: {
         elementType: 'input',
@@ -69,7 +73,8 @@ class ContactData extends React.Component {
           minLength: 5,
           maxLength: 5
         },
-        valid: false
+        valid: false,
+        touched: false
       },
       deliveryMethod: {
         elementType: 'select',
@@ -141,6 +146,7 @@ class ContactData extends React.Component {
     let orderForm = {...this.state.orderForm};
     orderForm[key].value = e.target.value;
     orderForm[key].valid = this.checkValidity(e.target.value, orderForm[key].validation);
+    orderForm[key].touched = true; // nếu input đã được thay đổi, toggle touch props value
     console.log(orderForm);
     this.setState({
       orderForm: orderForm
@@ -166,6 +172,9 @@ class ContactData extends React.Component {
               elementType={formElement.config.elementType}
               elementConfig={formElement.config.elementConfig}
               value={formElement.config.value}
+              invalid={!formElement.config.valid} // truyền valid props vào cho Input component
+              shouldValidate={formElement.config.validation} // để không check validation cho dropdown
+              touched={formElement.config.touched}
               changed={(e) => this.inputChangedHandler(e, formElement.id)}
             />
           })}
