@@ -1,17 +1,17 @@
-import React from 'react';
+import React from "react";
 
-const input = props => {
+const textarea = (props) => {
   return (
     <fieldset className="form-group">
-      <input
-        className="form-control form-control-lg"
-        type={props.type}
+      <textarea
+        className="form-control"
+        rows="8"
         placeholder={props.placeholder}
         value={props.value}
         onChange={(e) => props.changed(e)}
       />
     </fieldset>
   );
-}
+};
 
-export default input;
+export default textarea;

@@ -31,7 +31,7 @@ class NavigationItems extends React.Component {
         },
         {
           name: 'New Article',
-          url: 'articles/new'
+          url: '/new-article'
         },
         {
           name: 'Settings',

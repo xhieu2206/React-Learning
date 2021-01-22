@@ -8,6 +8,7 @@ import Layout from './hoc/Layout/Layout';
 import Home from './containers/Home/Home';
 import SignIn from './containers/Signin/SignIn';
 import SignUp from './containers/SignUp/SignUp';
+import Editor from './containers/Editor/Editor';
 
 class App extends React.Component {
   state = {
@@ -56,6 +57,8 @@ class App extends React.Component {
               <Route path="/signin" render={(props) => (<SignIn {...props} />)} />
               <Route path="/signup" render={(props) =>(<SignUp {...props} />)} />
               <Route path="/users/:slug" render={() => <h1>User Detail Page</h1>} />
+              <Route path="/new-article" render={(props) => (<Editor {...props} />)} />
+              <Route path="/articles/:slug/edit" render={(props) => (<Editor {...props} />)} />
               <Route path="/articles/:slug" render={() => <h1>Article Detail Page</h1>} />
               <Route path="/" render={(props) => (<Home {...props} />)} />
             </Switch>
