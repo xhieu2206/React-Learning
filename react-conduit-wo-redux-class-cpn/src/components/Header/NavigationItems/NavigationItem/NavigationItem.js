@@ -13,6 +13,7 @@ const navigationItem = props => {
           pathname: props.url
         }}
       >
+        {props.image ? <img className="user-pic" src={props.image} alt={props.image} /> : null}
         {props.name}
       </NavLink>
     </li>

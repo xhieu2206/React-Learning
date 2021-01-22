@@ -8,7 +8,7 @@ class Layout extends React.Component {
   render() {
     return (
       <Aux>
-        <Header isLoggedIn={this.props.isLoggedIn} />
+        <Header />
         {this.props.children}
         <Footer />
       </Aux>

@@ -1,7 +1,7 @@
-export const headersGenerator = (token = '') => {
+export const headersGenerator = token => {
   if (token) return {
     "Content-Type": "application/json",
-    "authorization": `Token ${token}`
+    "Authorization": `Token ${token}`
   }
   return {
     "Content-Type": "application/json"

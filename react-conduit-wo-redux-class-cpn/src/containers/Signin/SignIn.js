@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
+import AuthContext from '../../context/authContext';
+
 import { errorTransform } from '../../utils/ErrorTransform';
 import User from '../../models/User';
 
@@ -14,6 +16,8 @@ class SignIn extends React.Component {
     password: '',
     errors: []
   }
+
+  static contextType = AuthContext;
 
   emailChangedHandler = e => {
     this.setState({
@@ -32,14 +36,14 @@ class SignIn extends React.Component {
     const user = new User();
     user.signIn(this.state.email, this.state.password)
       .then(res => {
-        this.props.loggedIn(res.data);
+        this.context.login(res.data);
         this.props.history.replace("/");
       })
       .catch(err => {
         this.setState({
           errors: [...errorTransform(err.response.data.errors)]
         });
-      })
+      });
   }
 
   render() {

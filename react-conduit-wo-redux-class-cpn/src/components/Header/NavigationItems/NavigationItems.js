@@ -1,10 +1,14 @@
 import React from 'react';
 
+import AuthContext from '../../../context/authContext';
+
 import NavigationItem from './NavigationItem/NavigationItem';
 
 class NavigationItems extends React.Component {
-  state = {
-    items: [
+  static contextType = AuthContext;
+
+  render() {
+    let items = [
       {
         name: 'Home',
         url: '/'
@@ -17,18 +21,38 @@ class NavigationItems extends React.Component {
         name: 'Sign Up',
         url: '/signup'
       }
-    ]
-  }
+    ];
 
-  componentDidUpdate() {
-    console.log(this.props.isLoggedIn);
-  }
+    if (this.context.isLoggedIn) {
+      items = [
+        {
+          name: 'Home',
+          url: '/'
+        },
+        {
+          name: 'New Article',
+          url: 'articles/new'
+        },
+        {
+          name: 'Settings',
+          url: '/settings'
+        },
+        {
+          name: this.context.username,
+          url: 'users/current',
+          image: this.context.image
+        }
+      ]
+    }
 
-  render() {
     return (
       <ul className="nav navbar-nav pull-xs-right">
-        {this.state.items.map(item => (
-          <NavigationItem key={item.name} url={item.url} name={item.name} />
+        {items.map(item => (
+          <NavigationItem
+            key={item.name}
+            url={item.url}
+            name={item.name}
+            image={item.image} />
         ))}
       </ul>
     )
