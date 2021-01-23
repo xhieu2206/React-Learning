@@ -1,36 +1,39 @@
 import React from 'react';
 
 import AuthContext from '../../context/authContext';
+import Article from '../../models/Arcticle';
+import { errorTransform } from '../../utils/ErrorTransform';
 
 import Input from '../../components/UI/Input/Input';
 import Textarea from '../../components/UI/Textarea/Textarea';
 import Button from '../../components/UI/Button/Button';
+import ErrorMessages from '../../components/ErrorMessages/ErrorMessages';
 
 class Editor extends React.Component {
   state = {
     title: '',
     description: '',
     body: '',
-    tagList: []
+    tagList: [],
+    errors: []
   }
 
   static contextType = AuthContext;
 
   componentDidMount() {
-    console.log(this.props);
     if (!this.context.isLoggedIn) {
       this.props.history.push({
         pathname: '/signin'
-      })
-    } else {
-      // TODO: load article detail and fill the form
+      });
+    } else if (this.props.location.pathname === '/articles/:slug/edit') {
+      console.log('Editting article page')
     }
   }
 
   changedTagsHandler = e => {
     let value = e.target.value;
-    while (value.search(/  /) > -1) {
-      value = value.replace(/  /, ' ');
+    while (value.search("  ") > -1) {
+      value = value.replace("  ", ' ');
     }
     this.setState({
       tagList: [...value.split(' ')]
@@ -39,15 +42,37 @@ class Editor extends React.Component {
 
   submittedFormHandler = async (e) => {
     e.preventDefault();
+    if (this.props.location.pathname === '/new-article') { // create new article
+      const article = new Article();
+      const articleAwait = await article.newArticle(this.context.token, this.state.title, this.state.description, this.state.body, this.state.tagList);
+      if (articleAwait.errors) {
+        this.setState({
+          errors: [...errorTransform(articleAwait.errors)]
+        });
+      } else if (articleAwait.article) {
+        this.props.history.replace({
+          pathname: `/articles/${articleAwait.article.slug}`
+        });
+      }
+    } else { // update a article
+
+    }
   }
 
   render() {
+    let errors = null;
+    if (this.state.errors.length > 0) {
+      errors = <ErrorMessages errors={this.state.errors} />
+    }
+
     return (
       <div className="editor-page">
         <div className="container page">
           <div className="row">
             <div className="col-md-10 offset-md-1 col-xs-12">
-              <form>
+              {errors}
+
+              <form onSubmit={this.submittedFormHandler}>
                 <Input
                   type="text"
                   placeholder="Article Title"
@@ -63,7 +88,7 @@ class Editor extends React.Component {
                 <Textarea
                   placeholder="Write your article"
                   value={this.state.body}
-                  changed={(e) => { this.setState({ body: e.target.body }) }}
+                  changed={(e) => { this.setState({ body: e.target.value }) }}
                 />
                 <Input
                   type="text"

@@ -26,4 +26,23 @@ export default class User {
       headers: headersGenerator()
     });
   }
+
+  async update(token, username, bio, email, password, image) {
+    try {
+      const res = await axios.put(`${ENTRYPOINT}/user`, {
+        "user": {
+          "username": username,
+          "bio": bio,
+          "email": email,
+          "password": password,
+          "image": image
+        }
+      }, {
+        headers: headersGenerator(token)
+      });
+      return res.data;
+    } catch(e) {
+      return e.response.data;
+    }
+  }
 }

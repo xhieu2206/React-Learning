@@ -9,6 +9,7 @@ import Home from './containers/Home/Home';
 import SignIn from './containers/Signin/SignIn';
 import SignUp from './containers/SignUp/SignUp';
 import Editor from './containers/Editor/Editor';
+import Settings from './containers/Settings/Settings';
 
 class App extends React.Component {
   state = {
@@ -58,6 +59,7 @@ class App extends React.Component {
               <Route path="/signup" render={(props) =>(<SignUp {...props} />)} />
               <Route path="/users/:slug" render={() => <h1>User Detail Page</h1>} />
               <Route path="/new-article" render={(props) => (<Editor {...props} />)} />
+              <Route path="/settings" render={(props) => (<Settings {...props} />)} />
               <Route path="/articles/:slug/edit" render={(props) => (<Editor {...props} />)} />
               <Route path="/articles/:slug" render={() => <h1>Article Detail Page</h1>} />
               <Route path="/" render={(props) => (<Home {...props} />)} />
