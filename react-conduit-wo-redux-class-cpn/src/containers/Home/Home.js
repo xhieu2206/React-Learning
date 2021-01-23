@@ -1,7 +1,7 @@
 import React from 'react';
 import AuthContext from '../../context/authContext';
 
-import Article from '../../models/Arcticle';
+import Article from '../../models/Article';
 
 import Banner from '../../components/Banner/Banner';
 import FeedItems from '../../components/FeedItems/FeedItems';

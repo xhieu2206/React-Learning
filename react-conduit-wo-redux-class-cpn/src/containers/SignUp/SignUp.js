@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
+import authGuard from '../../hoc/AuthGuard/AuthGuard';
 import AuthContext from '../../context/authContext';
 
 import { errorTransform } from '../../utils/ErrorTransform';
@@ -105,4 +106,4 @@ class SignIn extends React.Component {
   }
 }
 
-export default SignIn;
+export default authGuard(SignIn, false);

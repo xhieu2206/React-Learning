@@ -1,5 +1,6 @@
 import React from 'react';
 
+import authGuard from '../../hoc/AuthGuard/AuthGuard';
 import AuthContext from '../../context/authContext';
 import User from '../../models/User';
 
@@ -120,4 +121,4 @@ class Settings extends React.Component {
   }
 }
 
-export default Settings;
+export default authGuard(Settings, true);

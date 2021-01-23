@@ -23,6 +23,7 @@ const articlePreview = props => {
         title={props.title}
         description={props.description}
         tags={props.tags}
+        slug={props.slug}
       />
     </div>
   )

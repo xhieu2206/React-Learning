@@ -1,7 +1,8 @@
 import React from 'react';
 
+import authGuard from '../../hoc/AuthGuard/AuthGuard';
 import AuthContext from '../../context/authContext';
-import Article from '../../models/Arcticle';
+import Article from '../../models/Article';
 import { errorTransform } from '../../utils/ErrorTransform';
 
 import Input from '../../components/UI/Input/Input';
@@ -21,11 +22,7 @@ class Editor extends React.Component {
   static contextType = AuthContext;
 
   componentDidMount() {
-    if (!this.context.isLoggedIn) {
-      this.props.history.push({
-        pathname: '/signin'
-      });
-    } else if (this.props.location.pathname === '/articles/:slug/edit') {
+    if (this.props.location.pathname === '/articles/:slug/edit') {
       console.log('Editting article page')
     }
   }
@@ -111,4 +108,4 @@ class Editor extends React.Component {
   }
 }
 
-export default Editor;
+export default authGuard(Editor, true);

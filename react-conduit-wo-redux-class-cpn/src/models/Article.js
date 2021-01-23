@@ -6,6 +6,20 @@ import { headersGenerator } from '../utils/RequestHeaderUtil';
 const itemsPerPage = 10;
 
 export default class Article {
+  async getArticle(token, slug) {
+    try {
+      const res = await axios.get(
+        `${ENTRYPOINT}/articles/${slug}`,
+        {
+          headers: headersGenerator(token)
+        }
+      );
+      return res.data;
+    } catch(e) {
+      return e.response.data;
+    }
+  }
+
   async getArticles(token, tag = '', author = '', favorited = '', page) {
     try {
       const res = await axios.get(
