@@ -39,7 +39,7 @@ class NavigationItems extends React.Component {
         },
         {
           name: this.context.username,
-          url: 'users/current',
+          url: '/users/' + this.context.username,
           image: this.context.image
         }
       ]

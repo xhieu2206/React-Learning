@@ -11,6 +11,7 @@ import SignUp from './containers/SignUp/SignUp';
 import Editor from './containers/Editor/Editor';
 import Settings from './containers/Settings/Settings';
 import ArticleDetailPage from './containers/ArticleDetailPage/ArticleDetailPage';
+import ProfilePage from './containers/ProfilePage/ProfilePage';
 
 class App extends React.Component {
   state = {
@@ -58,7 +59,7 @@ class App extends React.Component {
             <Switch>
               <Route path="/signin" render={(props) => (<SignIn {...props} />)} />
               <Route path="/signup" render={(props) =>(<SignUp {...props} />)} />
-              <Route path="/users/:slug" render={() => <h1>User Detail Page</h1>} />
+              <Route path="/users/:slug" render={(props) => (<ProfilePage {...props} />)} />
               <Route path="/new-article" render={(props) => (<Editor {...props} />)} />
               <Route path="/settings" render={(props) => (<Settings {...props} />)} />
               <Route path="/articles/:slug/edit" render={(props) => (<Editor {...props} />)} />

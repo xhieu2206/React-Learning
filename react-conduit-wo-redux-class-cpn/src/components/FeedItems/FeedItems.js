@@ -14,7 +14,7 @@ class FeedItems extends React.Component {
       items.push(...['Your Feed', 'Global Feed']);
     } else if (this.props.location.pathname === '/' && !this.context.isLoggedIn) {
       items.push('Global Feed')
-    } else if (this.props.location.pathname === '/users') {
+    } else if (this.props.match.path === '/users/:slug') {
       items = ['My Articles', 'Favorited Articles'];
     }
     if (this.props.tag) items.push(`#${this.props.tag}`);

@@ -74,6 +74,23 @@ export default class Article {
       return e.response.data;
     }
   }
+  async updateArticle(token, slug, title, description, body, tagList) {
+    try {
+      const res = await axios.put(`${ENTRYPOINT}/articles/${slug}`, {
+        "article": {
+          "title": title,
+          "description": description,
+          "body": body,
+          "tagList": tagList
+        }
+      }, {
+        headers: headersGenerator(token)
+      });
+      return res.data;
+    } catch(e) {
+      return e.response.data;
+    }
+  }
 
   async toggleFavoritedArticle(token, articleSlug, type) {
     try {

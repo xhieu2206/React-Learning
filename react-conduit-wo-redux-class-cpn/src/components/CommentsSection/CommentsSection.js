@@ -6,7 +6,7 @@ import Comment from './Comment/Comment';
 
 const CommentsSection = props => {
   const authContext = useContext(AuthContext);
-  // console.log(props.comments)
+
   return (
     <Aux>
       {props.comments.map(cmt => (

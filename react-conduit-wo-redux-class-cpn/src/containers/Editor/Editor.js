@@ -21,9 +21,20 @@ class Editor extends React.Component {
 
   static contextType = AuthContext;
 
-  componentDidMount() {
-    if (this.props.location.pathname === '/articles/:slug/edit') {
-      console.log('Editting article page')
+  async componentDidMount() {
+    if (this.props.match.path === '/articles/:slug/edit') {
+      const article = new Article();
+      const articleAwait = await article.getArticle(this.context.token, this.props.match.params.slug);
+      if (articleAwait.error || (articleAwait.article.author.username !== this.context.username)) {
+        this.props.historty.replace('/');
+      } else {
+        this.setState({
+          title: articleAwait.article.title,
+          description: articleAwait.article.description,
+          body: articleAwait.article.body,
+          tagList: [...articleAwait.article.tagList]
+        });
+      }
     }
   }
 
@@ -39,8 +50,8 @@ class Editor extends React.Component {
 
   submittedFormHandler = async (e) => {
     e.preventDefault();
+    const article = new Article();
     if (this.props.location.pathname === '/new-article') { // create new article
-      const article = new Article();
       const articleAwait = await article.newArticle(this.context.token, this.state.title, this.state.description, this.state.body, this.state.tagList);
       if (articleAwait.errors) {
         this.setState({
@@ -52,7 +63,17 @@ class Editor extends React.Component {
         });
       }
     } else { // update a article
-
+      const slug = this.props.match.params.slug;
+      const articleAwait = await article.updateArticle(this.context.token, slug, this.state.title, this.state.description, this.state.body, this.state.tagList);
+      if (articleAwait.errors) {
+        this.setState({
+          errors: [...errorTransform(articleAwait.errors)]
+        });
+      } else if (articleAwait.article) {
+        this.props.history.replace({
+          pathname: `/articles/${articleAwait.article.slug}`
+        });
+      }
     }
   }
 

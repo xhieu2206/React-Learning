@@ -17,7 +17,7 @@ class Settings extends React.Component {
     username: '',
     bio: '',
     email: '',
-    password: 'password',
+    password: '',
     errors: []
   }
 
@@ -36,7 +36,6 @@ class Settings extends React.Component {
     e.preventDefault();
     const user = new User();
     const userAwait = await user.update(this.context.token, this.state.username, this.state.bio, this.state.email, this.state.password, this.state.image);
-    console.log(userAwait);
     if (userAwait.errors) {
       this.setState({
         errors: [...errorTransform(userAwait.errors)]

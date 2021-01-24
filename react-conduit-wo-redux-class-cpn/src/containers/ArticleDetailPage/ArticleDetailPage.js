@@ -46,7 +46,6 @@ class ArticleDetailPage extends React.Component {
     const slug = this.props.match.params.slug;
     const articleAwait = await article.getArticle(this.context.token, slug);
     const commentsAwait = await comment.getComments(this.context.token, slug);
-    console.log(articleAwait, commentsAwait);
     if (articleAwait.error === 'Not Found') {
       this.props.history.replace("/");
     } else {
