@@ -21,6 +21,7 @@ const commentForm = props => {
           type="primary"
           clicked={props.clicked}
           outline={false}
+          size="sm"
         >Post Comment</Button>
       </div>
     </form>

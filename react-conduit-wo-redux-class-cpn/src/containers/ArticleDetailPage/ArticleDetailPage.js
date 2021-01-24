@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { errorTransform } from '../../utils/ErrorTransform';
 import Aux from '../../hoc/Auxiliary/Auxiliary';
 import AuthContext from '../../context/authContext';
 import FeedAuthor from '../../components/ArticlePreview/FeedAuthor/FeedAuthor';
@@ -11,6 +12,8 @@ import FavoritedToggleButton from '../../components/UI/Button/FavoritedToggleBut
 import FollowToggleButton from '../../components/UI/Button/FollowToggleButton';
 import Tags from '../../components/ArticlePreview/ArticlePreviewDetail/Tags/Tags';
 import CommentForm from '../../components/CommentForm/CommentForm';
+import CommentsSection from '../../components/CommentsSection/CommentsSection';
+import ErrorMessages from '../../components/ErrorMessages/ErrorMessages';
 
 import Article from '../../models/Article';
 import Comment from '../../models/Comment';
@@ -29,7 +32,8 @@ class ArticleDetailPage extends React.Component {
     updatedAt: '',
     comments: [],
     commentForm: {
-      body: ''
+      body: '',
+      errors: []
     }
   }
 
@@ -46,7 +50,6 @@ class ArticleDetailPage extends React.Component {
     if (articleAwait.error === 'Not Found') {
       this.props.history.replace("/");
     } else {
-      console.log(articleAwait.article.author)
       this.setState({
         author: {...articleAwait.article.author},
         body: articleAwait.article.body,
@@ -65,6 +68,34 @@ class ArticleDetailPage extends React.Component {
 
   addCommentHandler = async e => {
     e.preventDefault();
+    const comment = new Comment();
+    const commentAwait = await comment.addComment(this.context.token, this.state.slug, this.state.commentForm.body);
+
+    console.log(commentAwait)
+    if (commentAwait.errors) {
+      const commentForm = {
+        body: '',
+        errors: [...errorTransform(commentAwait.errors)]
+      }
+      this.setState({
+        commentForm: {...commentForm}
+      });
+    } else {
+      const commentForm = {
+        body: '',
+        errors: []
+      };
+      let comments = [...this.state.comments];
+      comments.unshift(commentAwait.comment);
+      this.setState({
+        commentForm: commentForm,
+        comments: comments
+      });
+    }
+  }
+
+  deleteCommentHandler = async (commentId) => {
+    console.log(commentId);
   }
 
   render() {
@@ -97,20 +128,28 @@ class ArticleDetailPage extends React.Component {
     let commentForm = <p style={{ display: 'inherit' }}>
       <Link to="/signin">Sign in</Link> or <Link to="/signup">sign up</Link> to add comments on this article
     </p>
+    let commentErrors = null;
+    if (this.state.commentForm.errors.length > 0) {
+      commentErrors = <ErrorMessages errors={this.state.commentForm.errors} />
+    }
     if (this.context.isLoggedIn) {
-      commentForm = <CommentForm
-        value={this.state.commentForm.body}
-        changed={(e) => {
-          e.preventDefault();
-          const commentForm = {
-            body: e.target.value
-          }
-          this.setState({
-            commentForm: {...commentForm}
-          });
-        }}
-        clicked={this.addCommentHandler}
-      />
+      commentForm = (
+        <Aux>
+          {commentErrors}
+
+          <CommentForm
+            value={this.state.commentForm.body}
+            changed={(e) => {
+              let commentForm = {...this.state.commentForm};
+              commentForm.body = e.target.value;
+              this.setState({
+                commentForm: {...commentForm}
+              });
+            }}
+            clicked={this.addCommentHandler}
+          />
+        </Aux>
+      )
     }
 
     return (
@@ -153,6 +192,11 @@ class ArticleDetailPage extends React.Component {
           <div className="row">
             <div className="col-xs-12 col-md-8 offset-md-2">
               {commentForm}
+
+              <CommentsSection
+                clicked={this.deleteCommentHandler}
+                comments={this.state.comments}
+              />
             </div>
           </div>
         </div>

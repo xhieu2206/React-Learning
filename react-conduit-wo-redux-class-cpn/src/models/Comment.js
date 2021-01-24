@@ -14,4 +14,30 @@ export default class Comment {
       return e.response.data;
     }
   }
+
+  async addComment(token, slug, body) {
+    try {
+      const res = await axios.post(`${ENTRYPOINT}/articles/${slug}/comments`, {
+        "comment": {
+          "body": body
+        }
+      }, {
+        headers: headersGenerator(token)
+      });
+      return res.data
+    } catch(e) {
+      return e.response.data;
+    }
+  }
+
+  async deleteComment(token, slug, id) {
+    try {
+      const res = await axios.delete(`${ENTRYPOINT}/articles/${slug}/comments/${id}`, {
+        headers: headersGenerator(token)
+      });
+      return res.data;
+    } catch(e) {
+      return e.response.data;
+    }
+  }
 }
