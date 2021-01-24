@@ -27,6 +27,17 @@ export default class User {
     });
   }
 
+  async getCurrentUser(token) {
+    try {
+      const res = await axios.get(`${ENTRYPOINT}/user`, {
+        headers: headersGenerator(token)
+      });
+      return res.data;
+    } catch(e) {
+      console.log('Haven\'t logged in yet');
+    }
+  }
+
   async getUser(token, username) {
     try {
       const res = await axios.get(`${ENTRYPOINT}/profiles/${username}`, {

@@ -104,13 +104,17 @@ class ArticleDetailPage extends React.Component {
   }
 
   followButtonClickedHandler = async _ => {
-    const type = this.state.author.following ? 'unfollow' : 'follow';
-    const user = new User();
-    const userAwait = await user.toggleFollowUser(this.context.token, type, this.state.author.username);
-    const author = {...userAwait};
-    this.setState({
-      author: {...author}
-    });
+    if (!this.context.isLoggedIn) {
+      this.props.history.push('/signin');
+    } else {
+      const type = this.state.author.following ? 'unfollow' : 'follow';
+      const user = new User();
+      const userAwait = await user.toggleFollowUser(this.context.token, type, this.state.author.username);
+      const author = {...userAwait};
+      this.setState({
+        author: {...author}
+      });
+    }
   }
 
   favoritedButtonClickedHandler = async _ => {

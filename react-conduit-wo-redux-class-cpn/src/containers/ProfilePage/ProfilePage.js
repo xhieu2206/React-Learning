@@ -55,6 +55,14 @@ class ProfilePage extends React.Component {
   followButtonClickedHandler = async _ => {
     if (!this.context.isLoggedIn) {
       this.props.history.push('/signin');
+    } else {
+      const type = this.state.profile.following ? 'unfollow' : 'follow';
+      const user = new User();
+      const userAwait = await user.toggleFollowUser(this.context.token, type, this.state.profile.username);
+      const profile = {...userAwait};
+      this.setState({
+        profile: {...profile}
+      });
     }
   }
 

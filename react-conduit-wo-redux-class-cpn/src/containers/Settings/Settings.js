@@ -49,7 +49,10 @@ class Settings extends React.Component {
   }
 
   logoutButtonClickedHandler = _ => {
-
+    this.context.logout();
+    this.props.history.replace({
+      pathname: '/'
+    });
   }
 
   render() {

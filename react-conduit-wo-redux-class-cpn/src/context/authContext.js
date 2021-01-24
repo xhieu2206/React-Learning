@@ -9,6 +9,7 @@ const authContext = React.createContext({
   id: null,
   email: '',
   login: () => {},
+  logout: () => {},
   setInformation: () => {}
 });
 

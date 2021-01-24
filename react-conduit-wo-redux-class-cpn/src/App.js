@@ -13,6 +13,8 @@ import Settings from './containers/Settings/Settings';
 import ArticleDetailPage from './containers/ArticleDetailPage/ArticleDetailPage';
 import ProfilePage from './containers/ProfilePage/ProfilePage';
 
+import User from './models/User';
+
 class App extends React.Component {
   state = {
     isLoggedIn: false,
@@ -28,6 +30,17 @@ class App extends React.Component {
     }
   }
 
+  async componentDidMount() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const user = new User();
+      const awaitUser = await user.getCurrentUser(token);
+      if (awaitUser.user) {
+        this.loginHandler(awaitUser);
+      }
+    }
+  }
+
   loginHandler = (user) => {
     const loggedInUser = {...user.user};
     delete loggedInUser["token"];
@@ -36,6 +49,24 @@ class App extends React.Component {
       token: user.user.token,
       loggedInUser: {...loggedInUser}
     });
+    localStorage.setItem('token', user.user.token);
+  }
+
+  logoutHandler = _ => {
+    this.setState({
+      isLoggedIn: false,
+      token: '',
+      loggedInUser: {
+        bio: '',
+        username: '',
+        email: '',
+        id: '',
+        image: '',
+        createdAt: '',
+        updatedAt: ''
+      }
+    });
+    localStorage.removeItem('token');
   }
 
   render() {
@@ -51,7 +82,8 @@ class App extends React.Component {
               image: this.state.loggedInUser.image,
               bio: this.state.loggedInUser.bio,
               id: this.state.loggedInUser.id,
-              login: this.loginHandler
+              login: this.loginHandler,
+              logout: this.logoutHandler
             }
           }
         >
