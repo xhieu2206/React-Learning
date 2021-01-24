@@ -17,6 +17,7 @@ import ErrorMessages from '../../components/ErrorMessages/ErrorMessages';
 
 import Article from '../../models/Article';
 import Comment from '../../models/Comment';
+import User from '../../models/User';
 
 class ArticleDetailPage extends React.Component {
   state = {
@@ -40,13 +41,12 @@ class ArticleDetailPage extends React.Component {
   static contextType = AuthContext;
 
   async componentDidMount() {
-    console.log(this.props);
     const article = new Article();
     const comment = new Comment();
     const slug = this.props.match.params.slug;
     const articleAwait = await article.getArticle(this.context.token, slug);
     const commentsAwait = await comment.getComments(this.context.token, slug);
-    console.log(articleAwait, commentsAwait)
+    console.log(articleAwait, commentsAwait);
     if (articleAwait.error === 'Not Found') {
       this.props.history.replace("/");
     } else {
@@ -71,7 +71,6 @@ class ArticleDetailPage extends React.Component {
     const comment = new Comment();
     const commentAwait = await comment.addComment(this.context.token, this.state.slug, this.state.commentForm.body);
 
-    console.log(commentAwait)
     if (commentAwait.errors) {
       const commentForm = {
         body: '',
@@ -94,8 +93,43 @@ class ArticleDetailPage extends React.Component {
     }
   }
 
-  deleteCommentHandler = async (commentId) => {
-    console.log(commentId);
+  deleteCommentHandler = async commentId => {
+    const comment = new Comment();
+    await comment.deleteComment(this.context.token, this.state.slug, commentId);
+    const comments = [...this.state.comments];
+    const deletedCommentIndex = comments.findIndex(cmt => cmt.id === commentId);
+    comments.splice(deletedCommentIndex, 1);
+    this.setState({
+      comments: [...comments]
+    });
+  }
+
+  followButtonClickedHandler = async _ => {
+    const type = this.state.author.following ? 'unfollow' : 'follow';
+    const user = new User();
+    const userAwait = await user.toggleFollowUser(this.context.token, type, this.state.author.username);
+    const author = {...userAwait};
+    this.setState({
+      author: {...author}
+    });
+  }
+
+  favoritedButtonClickedHandler = async _ => {
+    const article = new Article();
+    const type = this.state.favorited ? "dislike" : "like";
+    const articleAwait = await article.toggleFavoritedArticle(this.context.token, this.state.slug, type);
+    this.setState({
+      favoritesCount: articleAwait.favoritesCount,
+      favorited: articleAwait.favorited
+    });
+  }
+
+  deleteArticleButtonClcikedHandler = async _ => {
+    const article = new Article();
+    const deletedArticleAwait = await article.deleteArticle(this.context.token, this.state.slug);
+    if (!deletedArticleAwait) {
+      this.props.history.replace("/");
+    }
   }
 
   render() {
@@ -104,12 +138,12 @@ class ArticleDetailPage extends React.Component {
         <FollowToggleButton
           following={this.state.author.following}
           username={this.state.author.username}
-          clicked={() => {}}/>
+          clicked={this.followButtonClickedHandler}/>
         &nbsp;&nbsp;
         <FavoritedToggleButton
           favorited={this.state.favorited}
           favoritesCount={this.state.favoritesCount}
-          clicked={() => {}} />
+          clicked={this.favoritedButtonClickedHandler} />
       </Aux>
     );
     if (this.context.username === this.state.author.username) {
@@ -119,7 +153,7 @@ class ArticleDetailPage extends React.Component {
             slug={this.state.slug}
           />&nbsp;&nbsp;
           <DeleteArticleButton
-            clicked={() => {}}
+            clicked={this.deleteArticleButtonClcikedHandler}
           />
         </Aux>
       )

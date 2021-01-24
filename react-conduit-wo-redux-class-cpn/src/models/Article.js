@@ -87,4 +87,17 @@ export default class Article {
       console.log(err);
     }
   }
+
+  async deleteArticle(token, slug) {
+    try {
+      const res = axios({
+        method: 'DELETE',
+        url: `${ENTRYPOINT}/articles/${slug}`,
+        headers: headersGenerator(token)
+      });
+      return res.data;
+    } catch(e) {
+      return e.response.data;
+    }
+  }
 }

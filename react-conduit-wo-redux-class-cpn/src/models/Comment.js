@@ -32,7 +32,9 @@ export default class Comment {
 
   async deleteComment(token, slug, id) {
     try {
-      const res = await axios.delete(`${ENTRYPOINT}/articles/${slug}/comments/${id}`, {
+      const res = axios({
+        method: 'DELETE',
+        url: `${ENTRYPOINT}/articles/${slug}/comments/${id}`,
         headers: headersGenerator(token)
       });
       return res.data;

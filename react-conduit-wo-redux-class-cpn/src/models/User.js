@@ -45,4 +45,17 @@ export default class User {
       return e.response.data;
     }
   }
+
+  async toggleFollowUser(token, type, username) {
+    try {
+      const res = await axios({
+        method: `${type === 'follow' ? 'POST' : 'DELETE'}`,
+        url: `${ENTRYPOINT}/profiles/${username}/follow`,
+        headers: headersGenerator(token)
+      });
+      return res.data.profile;
+    } catch(err) {
+      alert('Error while trying to follow an user');
+    }
+  }
 }

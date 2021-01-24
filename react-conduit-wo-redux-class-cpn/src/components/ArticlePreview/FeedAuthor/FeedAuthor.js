@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from 'react-router-dom';
+
 import { DEFAULTAVATAR } from "../../../constants/URL";
 import { formatISOdate } from '../../../utils/DateUtil';
 
@@ -7,15 +9,15 @@ import Aux from '../../../hoc/Auxiliary/Auxiliary';
 const feedAuthor = (props) => {
   return (
     <Aux>
-      <a href="/">
+      <Link to={"/users/" + props.author}>
         <img
           src={props.image ? props.image : DEFAULTAVATAR}
           alt={DEFAULTAVATAR} />
-      </a>
+      </Link>
       <div className="info">
-        <a href="/" className="author">
+        <Link to={"/users/" + props.author} className="author">
           {props.author}
-        </a>
+        </Link>
         <span className="date">{formatISOdate(props.createdAt)}</span>
       </div>
     </Aux>
