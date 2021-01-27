@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'; // đây là 1 function, nhận vào 1 configuration object, và trả về một HOC sẽ nhận vào component được passed state từ store
+import * as actionTypes from '../../store/actions';
 
 import CounterControl from '../../components/CounterControl/CounterControl';
 import CounterOutput from '../../components/CounterOutput/CounterOutput';
@@ -14,9 +15,9 @@ class Counter extends Component {
                 <CounterControl label="Add 5" clicked={this.props.onAddCounter}  />
                 <CounterControl label="Subtract 5" clicked={this.props.onSubtractCounter}  />
                 <hr />
-                <button onClick={this.props.onStoreResult}>Store Result</button>
+                <button onClick={() => this.props.onStoreResult(this.props.ctr)}>Store Result</button>
                 <ul>
-                    {this.props.storedResult.map((item) => (
+                    {this.props.storedResult.map(item => (
                         <li
                             onClick={() => this.props.onDeleteResult(item.id)}
                             key={item.id}
@@ -32,36 +33,39 @@ class Counter extends Component {
 
 const mapStateToProps = state => { // configuration object
     return {
-        ctr: state.counter,
-        storedResult: state.result
+        ctr: state.ctr.counter,
+        storedResult: state.res.result
     };
 }
 
 const mapDispatchToProps = dispatch => {
     return {
         onIncrementCounter: () => dispatch({
-            type: 'INCREMENT'
+            type: actionTypes.INCREMENT
         }),
         onDecreasementCounter: () => dispatch({
-            type: 'DECREASEMENT'
+            type: actionTypes.DECREASEMENT
         }),
         onAddCounter: () => dispatch({
-            type: 'ADD',
+            type: actionTypes.ADD,
             payload: {
                 value: 5
             }
         }),
         onSubtractCounter: () => dispatch({
-            type: 'SUBTRACT',
+            type: actionTypes.SUBTRACT,
             payload: {
                 value: 5
             }
         }),
-        onStoreResult: () => dispatch({
-            type: 'STORE_RESULT'
+        onStoreResult: (counter) => dispatch({
+            type: actionTypes.STORE_RESULT,
+            payload: {
+                counter: counter
+            }
         }),
         onDeleteResult: (id) => dispatch({
-            type: 'DELETE_RESULT',
+            type: actionTypes.DELETE_RESULT,
             payload: {
                 id: id
             }
