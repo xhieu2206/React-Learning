@@ -1,48 +1,72 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'; // đây là 1 function, nhận vào 1 configuration object, và trả về một HOC sẽ nhận vào component được passed state từ store
 
 import CounterControl from '../../components/CounterControl/CounterControl';
 import CounterOutput from '../../components/CounterOutput/CounterOutput';
 
 class Counter extends Component {
-    state = {
-        counter: 0
-    }
-
-    counterChangedHandler = ( action, value ) => {
-        switch ( action ) {
-            case 'inc':
-                this.setState( ( prevState ) => { return { counter: prevState.counter + 1 } } )
-                break;
-            case 'dec':
-                this.setState( ( prevState ) => { return { counter: prevState.counter - 1 } } )
-                break;
-            case 'add':
-                this.setState( ( prevState ) => { return { counter: prevState.counter + value } } )
-                break;
-            case 'sub':
-                this.setState( ( prevState ) => { return { counter: prevState.counter - value } } )
-                break;
-        }
-    }
-
     render () {
         return (
             <div>
-                <CounterOutput value={this.state.counter} />
-                <CounterControl label="Increment" clicked={() => this.counterChangedHandler( 'inc' )} />
-                <CounterControl label="Decrement" clicked={() => this.counterChangedHandler( 'dec' )}  />
-                <CounterControl label="Add 5" clicked={() => this.counterChangedHandler( 'add', 5 )}  />
-                <CounterControl label="Subtract 5" clicked={() => this.counterChangedHandler( 'sub', 5 )}  />
+                <CounterOutput value={this.props.ctr} /> {/* ở đây chúng ta sẽ dùng props chứ không còn là state nữa. */}
+                <CounterControl label="Increment" clicked={this.props.onIncrementCounter} /> {/* dùng action được dispatched. */}
+                <CounterControl label="Decrement" clicked={this.props.onDecreasementCounter}  />
+                <CounterControl label="Add 5" clicked={this.props.onAddCounter}  />
+                <CounterControl label="Subtract 5" clicked={this.props.onSubtractCounter}  />
+                <hr />
+                <button onClick={this.props.onStoreResult}>Store Result</button>
+                <ul>
+                    {this.props.storedResult.map((item) => (
+                        <li
+                            onClick={() => this.props.onDeleteResult(item.id)}
+                            key={item.id}
+                        >
+                            {item.value}
+                        </li>
+                    ))}
+                </ul>
             </div>
         );
     }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = state => { // configuration object
     return {
-        counter: state.counter
+        ctr: state.counter,
+        storedResult: state.result
     };
 }
 
-export default connect(mapStateToProps)(Counter);
+const mapDispatchToProps = dispatch => {
+    return {
+        onIncrementCounter: () => dispatch({
+            type: 'INCREMENT'
+        }),
+        onDecreasementCounter: () => dispatch({
+            type: 'DECREASEMENT'
+        }),
+        onAddCounter: () => dispatch({
+            type: 'ADD',
+            payload: {
+                value: 5
+            }
+        }),
+        onSubtractCounter: () => dispatch({
+            type: 'SUBTRACT',
+            payload: {
+                value: 5
+            }
+        }),
+        onStoreResult: () => dispatch({
+            type: 'STORE_RESULT'
+        }),
+        onDeleteResult: (id) => dispatch({
+            type: 'DELETE_RESULT',
+            payload: {
+                id: id
+            }
+        })
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Counter); // second arg chính là actions là chúng ta muốn dispatch từ component này
