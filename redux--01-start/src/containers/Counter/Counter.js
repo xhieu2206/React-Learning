@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'; // đây là 1 function, nhận vào 1 configuration object, và trả về một HOC sẽ nhận vào component được passed state từ store
-import * as actionTypes from '../../store/actions';
+import { increment, decreasement, add, subtract, storeDefault, deleteResult } from '../../store/actions/actions';
 
 import CounterControl from '../../components/CounterControl/CounterControl';
 import CounterOutput from '../../components/CounterOutput/CounterOutput';
@@ -40,36 +40,12 @@ const mapStateToProps = state => { // configuration object
 
 const mapDispatchToProps = dispatch => {
     return {
-        onIncrementCounter: () => dispatch({
-            type: actionTypes.INCREMENT
-        }),
-        onDecreasementCounter: () => dispatch({
-            type: actionTypes.DECREASEMENT
-        }),
-        onAddCounter: () => dispatch({
-            type: actionTypes.ADD,
-            payload: {
-                value: 5
-            }
-        }),
-        onSubtractCounter: () => dispatch({
-            type: actionTypes.SUBTRACT,
-            payload: {
-                value: 5
-            }
-        }),
-        onStoreResult: (counter) => dispatch({
-            type: actionTypes.STORE_RESULT,
-            payload: {
-                counter: counter
-            }
-        }),
-        onDeleteResult: (id) => dispatch({
-            type: actionTypes.DELETE_RESULT,
-            payload: {
-                id: id
-            }
-        })
+        onIncrementCounter: () => dispatch(increment()),
+        onDecreasementCounter: () => dispatch(decreasement()),
+        onAddCounter: () => dispatch(add(5)),
+        onSubtractCounter: () => dispatch(subtract(5)),
+        onStoreResult: (counter) => dispatch(storeDefault(counter)),
+        onDeleteResult: (id) => dispatch(deleteResult(id))
     };
 }
 
