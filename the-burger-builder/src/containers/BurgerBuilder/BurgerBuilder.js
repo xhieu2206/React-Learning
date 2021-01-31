@@ -14,16 +14,11 @@ import * as burgerBuilderActions from '../../store/actions/index';
 
 class BurgerBuilder extends React.Component {
   state = {
-    purchasing: false,
-    loading: false
+    purchasing: false
   }
 
-  async componentDidMount () {
-    // const { data } = await axios.get('https://react-burger-builder-64bad-default-rtdb.firebaseio.com/ingredients.json');
-    // const ingredients = {...data};
-    // this.setState({
-    //   ingredients: ingredients
-    // });
+  async componentDidMount() {
+    await this.props.onInitIngredients();
   }
 
   updatePurchaseState(updatingIngredients) {
@@ -82,9 +77,6 @@ class BurgerBuilder extends React.Component {
         price={this.props.price}
       />
     }
-    if (this.state.loading) {
-      orderSummary = <Spinner />;
-    }
     return(
       <Aux>
         <Modal
@@ -102,14 +94,16 @@ class BurgerBuilder extends React.Component {
 const mapStateToProps = state => {
   return {
     ings: state.ingredients,
-    price: state.totalPrice
+    price: state.totalPrice,
+    error: state.error
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
     onIngredientAdded: (ingredientName) => dispatch(burgerBuilderActions.addIngredient(ingredientName)),
-    onIngredientRemove: (ingredientName) => dispatch(burgerBuilderActions.removeIngredient(ingredientName))
+    onIngredientRemove: (ingredientName) => dispatch(burgerBuilderActions.removeIngredient(ingredientName)),
+    onInitIngredients: () => dispatch(burgerBuilderActions.initIngredients())
   }
 }
 
