@@ -10,8 +10,10 @@ const saveResult = counter => {
 }
 
 export const storeDefault = counter => {
-  return dispatch => { // func này nhận vào một dispatch là một arg, và chúng ta get this dispatch due to redux-thunk. Có thể nói middware chạy giữa khoảng thời gian dispatching một action và thời điểm action reaches the reducer
+  return (dispatch, getState) => { // method để get current state
     setTimeout(() => {
+      const oldCounter = getState().ctr.counter; // getvalue of old state.
+      console.log('Old counter:', oldCounter);
       dispatch(saveResult(counter)); // execute saveResult(counter) để return về action
     }, 2000);
   }
