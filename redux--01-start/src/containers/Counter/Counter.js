@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'; // đây là 1 function, nhận vào 1 configuration object, và trả về một HOC sẽ nhận vào component được passed state từ store
-import { increment, decreasement, add, subtract, storeDefault, deleteResult } from '../../store/actions/actions';
+import * as actionTypes from '../../store/actions/index';
 
 import CounterControl from '../../components/CounterControl/CounterControl';
 import CounterOutput from '../../components/CounterOutput/CounterOutput';
@@ -40,12 +40,12 @@ const mapStateToProps = state => { // configuration object
 
 const mapDispatchToProps = dispatch => {
     return {
-        onIncrementCounter: () => dispatch(increment()),
-        onDecreasementCounter: () => dispatch(decreasement()),
-        onAddCounter: () => dispatch(add(5)),
-        onSubtractCounter: () => dispatch(subtract(5)),
-        onStoreResult: (counter) => dispatch(storeDefault(counter)),
-        onDeleteResult: (id) => dispatch(deleteResult(id))
+        onIncrementCounter: () => dispatch(actionTypes.increment()),
+        onDecreasementCounter: () => dispatch(actionTypes.decreasement()),
+        onAddCounter: () => dispatch(actionTypes.add(5)),
+        onSubtractCounter: () => dispatch(actionTypes.subtract(5)),
+        onStoreResult: (counter) => dispatch(actionTypes.storeDefault(counter)),
+        onDeleteResult: (id) => dispatch(actionTypes.deleteResult(id))
     };
 }
 
