@@ -93,8 +93,7 @@ class ContactData extends React.Component {
         valid: true // luôn luôn là true vì chúng ta không có validation cho dropdown
       }
     },
-    formIsValid: false, // check xem form đã valid chưa
-    loading: false
+    formIsValid: false // check xem form đã valid chưa
   }
 
   orderHandler = (e) => {
@@ -160,7 +159,7 @@ class ContactData extends React.Component {
     return (
       <div className={classes.ContactData}>
         <h4>Enter your Contact please</h4>
-        {!this.state.loading ? (
+        {!this.props.loading ? (
         <form onSubmit={this.orderHandler} >
           {formElementsArray.map(formElement => {
             return <Input
@@ -189,15 +188,16 @@ class ContactData extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    ings: state.ingredients,
-    price: state.totalPrice
+    ings: state.burgerBuilder.ingredients,
+    price: state.burgerBuilder.totalPrice,
+    loading: state.order.loading
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    onOrderBurger: (orderData) => dispatch(actions.purchaseBurgerStart(orderData))
+    onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
   }
 }
 
-export default connect(mapStateToProps)(withErrorHandler(ContactData, axios));
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
