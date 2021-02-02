@@ -41,3 +41,43 @@ export const purchaseInit = () => {
     type: actionTypes.PURCHASE_INIT
   }
 }
+
+export const fetchOrderSuccess = orders => {
+  return {
+    type: actionTypes.FETCH_ORDERS_SUCCESS,
+    orders: orders
+  }
+}
+
+export const fetchOrderFailed = error => {
+  return {
+    type: actionTypes.FETCH_ORDERS_FAILED,
+    error: error
+  }
+}
+
+export const fetchOrderStart = () => {
+  return {
+    type: actionTypes.FETCH_ORDERS_START
+  }
+}
+
+export const fetchOrder = () => {
+  return dispatch => {
+    dispatch(fetchOrderStart());
+    axios.get(`https://react-burger-builder-64bad-default-rtdb.firebaseio.com/orders.json`)
+      .then(({data}) => {
+        const orderArr = [];
+        for (const key in data) {
+          orderArr.push({
+            ...data[key],
+            id: key
+          });
+        }
+        dispatch(fetchOrderSuccess(orderArr));
+      })
+      .catch(err => {
+        dispatch(fetchOrderFailed(err));
+      });
+  }
+}
