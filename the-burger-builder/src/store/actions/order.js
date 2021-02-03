@@ -22,10 +22,10 @@ export const purchaseBurgerStart = () => {
   }
 }
 
-export const purchaseBurger = orderData => {
+export const purchaseBurger = (orderData, token) => {
   return dispatch => {
     dispatch(purchaseBurgerStart()); // execute trước khi send post request
-    axios.post('/orders.json', orderData)
+    axios.post(`/orders.json?auth=${token}`, orderData)
       .then(response => {
         console.log(response.data);
         dispatch(purchaseBurgerSuccess(response.data.name, orderData));
@@ -62,10 +62,13 @@ export const fetchOrderStart = () => {
   }
 }
 
-export const fetchOrder = () => {
+export const fetchOrder = (token) => {
+  // có thể dùng
+  // return (dispatch, getState) => {}
+  // để lấy giá trị của token vì chúng ta có store token bằng redux, tuy nhiên cách này là không khuyến khích
   return dispatch => {
     dispatch(fetchOrderStart());
-    axios.get(`https://react-burger-builder-64bad-default-rtdb.firebaseio.com/orders.json`)
+    axios.get(`https://react-burger-builder-64bad-default-rtdb.firebaseio.com/orders.json?auth=${token}`)
       .then(({data}) => {
         const orderArr = [];
         for (const key in data) {
