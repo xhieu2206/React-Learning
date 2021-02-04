@@ -62,13 +62,14 @@ export const fetchOrderStart = () => {
   }
 }
 
-export const fetchOrder = (token) => {
+export const fetchOrder = (token, userId) => {
   // có thể dùng
   // return (dispatch, getState) => {}
   // để lấy giá trị của token vì chúng ta có store token bằng redux, tuy nhiên cách này là không khuyến khích
   return dispatch => {
     dispatch(fetchOrderStart());
-    axios.get(`https://react-burger-builder-64bad-default-rtdb.firebaseio.com/orders.json?auth=${token}`)
+    const queryParams = `?auth=${token}&orderBy="userId"&equalTo="${userId}"`;
+    axios.get(`https://react-burger-builder-64bad-default-rtdb.firebaseio.com/orders.json${queryParams}`)
       .then(({data}) => {
         const orderArr = [];
         for (const key in data) {
