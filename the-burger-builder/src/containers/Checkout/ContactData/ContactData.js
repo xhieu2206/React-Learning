@@ -8,6 +8,7 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/index';
+import { checkValidity } from '../../../shared/utility';
 
 class ContactData extends React.Component {
   state = {
@@ -112,30 +113,10 @@ class ContactData extends React.Component {
     this.props.onOrderBurger(order, this.props.token);
   }
 
-  checkValidity(value, rules) {
-    let isValid = true;
-
-    // check for required field
-    if (rules.required) {
-      isValid = value.trim() !== '' && isValid;
-    }
-
-    // check for min length
-    if (rules.minLength) {
-      isValid = value.trim().length >= rules.minLength && isValid;
-    }
-
-    // check for max length
-    if (rules.maxLength) {
-      isValid = value.trim().length <= rules.maxLength && isValid;
-    }
-    return isValid;
-  }
-
   inputChangedHandler = (e, key) => {
     let orderForm = {...this.state.orderForm};
     orderForm[key].value = e.target.value;
-    orderForm[key].valid = this.checkValidity(e.target.value, orderForm[key].validation);
+    orderForm[key].valid = checkValidity(e.target.value, orderForm[key].validation);
     orderForm[key].touched = true; // nếu input đã được thay đổi, toggle touch props value
 
     let formIsValid = true;
@@ -157,6 +138,7 @@ class ContactData extends React.Component {
         config: this.state.orderForm[key]
       });
     }
+
     return (
       <div className={classes.ContactData}>
         <h4>Enter your Contact please</h4>
