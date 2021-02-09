@@ -5,12 +5,18 @@ import { connect } from 'react-redux';
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
 import ErrorMessages from '../../components/ErrorMessages/ErrorMessages';
+import LoadingSpinner  from '../../components/UI/LoadingSpinner/LoadingSpinner';
+import authGuard from '../../hoc/AuthGuard/AuthGuard'
 import * as actions from '../../store/actions/index';
 
 class SignIn extends React.Component {
   state = {
     email: '',
     password: ''
+  }
+
+  componentWillUnmount() {
+    this.props.onUnmount();
   }
 
   emailChangedHandler = e => {
@@ -41,6 +47,11 @@ class SignIn extends React.Component {
       redirect = <Redirect to="/" />
     }
 
+    let loading = null;
+    if (this.props.loading) {
+      loading = <LoadingSpinner />
+    }
+
     return (
       <div className="auth-page">
         <div className="container page">
@@ -55,6 +66,7 @@ class SignIn extends React.Component {
 
               {redirect}
               {errors}
+              {loading}
 
               <form>
                 <Input
@@ -94,8 +106,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onLogin: (email, password) => dispatch(actions.login(email, password))
+    onLogin: (email, password) => dispatch(actions.login(email, password)),
+    onUnmount: () => dispatch(actions.emptyErrors())
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SignIn);
+export default connect(mapStateToProps, mapDispatchToProps)(authGuard(SignIn, false));

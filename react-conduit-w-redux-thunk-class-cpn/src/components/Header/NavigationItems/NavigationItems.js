@@ -1,14 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import NavigationItem from './NavigationItem/NavigationItem';
 
 class NavigationItems extends React.Component {
-  state = {
-    isLoggedIn: false,
-    username: 'Xuan Hieu',
-    image: null
-  }
-
   render() {
     let items = [
       {
@@ -25,7 +20,7 @@ class NavigationItems extends React.Component {
       }
     ];
 
-    if (this.state.isLoggedIn) {
+    if (this.props.isLoggedIn) {
       items = [
         {
           name: 'Home',
@@ -40,18 +35,18 @@ class NavigationItems extends React.Component {
           url: '/settings'
         },
         {
-          name: this.state.username,
-          url: '/users/' + this.state.username,
-          image: this.state.image
+          name: this.props.username,
+          url: '/users/' + this.props.username,
+          image: this.props.image
         }
       ]
     }
 
     return (
       <ul className="nav navbar-nav pull-xs-right">
-        {items.map(item => (
+        {items.map((item, index) => (
           <NavigationItem
-            key={item.name}
+            key={index}
             url={item.url}
             name={item.name}
             image={item.image} />
@@ -61,4 +56,12 @@ class NavigationItems extends React.Component {
   }
 }
 
-export default NavigationItems;
+const mapStateToProps = state => {
+  return {
+    isLoggedIn: state.auth.isLoggedIn,
+    username: state.auth.user.username,
+    image: state.auth.user.image
+  }
+}
+
+export default connect(mapStateToProps, null)(NavigationItems);

@@ -1,19 +1,23 @@
 import React from "react";
-import { Link } from 'react-router-dom';
-
-import { errorTransform } from '../../utils/ErrorTransform';
-import User from '../../models/User';
+import { Link, Redirect } from 'react-router-dom';
+import { connect } from "react-redux";
 
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
+import LoadingSpinner  from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import ErrorMessages from '../../components/ErrorMessages/ErrorMessages';
+import authGuard from '../../hoc/AuthGuard/AuthGuard';
+import * as actions from '../../store/actions/index';
 
-class SignIn extends React.Component {
+class SignUp extends React.Component {
   state = {
     username: '',
     email: '',
-    password: '',
-    errors: []
+    password: ''
+  }
+
+  componentWillUnmount() {
+    this.props.onUnmount();
   }
 
   usernameChangedHandler = e => {
@@ -36,22 +40,23 @@ class SignIn extends React.Component {
 
   signup = async (e) => {
     e.preventDefault();
-    // const user = new User();
-    // try {
-    //   const res = await user.signUp(this.state.username, this.state.email, this.state.password);
-    //   this.context.login(res.data);
-    //   this.props.history.replace("/");
-    // } catch(err) {
-    //   this.setState({
-    //     errors: [...errorTransform(err.response.data.errors)]
-    //   });
-    // }
+    await this.props.onRegister(this.state.username, this.state.email, this.state.password);
   }
 
   render() {
     let errors = null;
-    if (this.state.errors.length > 0) {
-      errors = <ErrorMessages errors={this.state.errors} />
+    if (this.props.errors.length > 0) {
+      errors = <ErrorMessages errors={this.props.errors} />
+    }
+
+    let redirect = null;
+    if (this.props.isLoggedIn) {
+      redirect = <Redirect to="/" />
+    }
+
+    let loading = null;
+    if (this.props.loading) {
+      loading = <LoadingSpinner />
     }
 
     return (
@@ -66,7 +71,9 @@ class SignIn extends React.Component {
                 </Link>
               </p>
 
+              {redirect}
               {errors}
+              {loading}
 
               <form>
                 <Input
@@ -101,4 +108,19 @@ class SignIn extends React.Component {
   }
 }
 
-export default SignIn;
+const mapStateToProps = state => {
+  return {
+    loading: state.auth.loading,
+    errors: state.auth.errors,
+    isLoggedIn: state.auth.isLoggedIn
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onRegister: (username, email, password) => dispatch(actions.register(username, email, password)),
+    onUnmount: () => dispatch(actions.emptyErrors())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(authGuard(SignUp, false));

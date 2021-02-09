@@ -35,6 +35,7 @@ export default class User {
       return res.data;
     } catch(e) {
       console.log('Haven\'t logged in yet');
+      return e.response.data;
     }
   }
 

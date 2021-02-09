@@ -9,7 +9,7 @@ class Header extends React.Component {
       <nav className="navbar navbar-light">
         <div className="container">
           <Brand />
-          <NavigationItems isLoggedIn={this.props.isLoggedIn} />
+          <NavigationItems />
         </div>
       </nav>
     )

@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { DEFAULTAVATAR } from "../../../../constants/URL";
 
 const navigationItem = props => {
   const classesArray = ['nav-link'];
@@ -13,7 +14,7 @@ const navigationItem = props => {
           pathname: props.url
         }}
       >
-        {props.image ? <img className="user-pic" src={props.image} alt={props.image} /> : null}
+        {props.image ? <img className="user-pic" src={props.image} alt={DEFAULTAVATAR} /> : null}
         {props.name}
       </NavLink>
     </li>
