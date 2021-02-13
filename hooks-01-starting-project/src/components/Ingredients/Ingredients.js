@@ -1,88 +1,124 @@
-import React, { useState, useCallback } from 'react';
+import React, { useReducer, useCallback } from 'react';
 
 import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList'
 import ErrorModal from '../UI/ErrorModal';
 import Search from './Search';
 
-const Ingredients = () => {
-  const [userIngredients, setUserIngredients] = useState([]);
-  const [isLoading, setIsloading] = useState(false);
-  const [error, setError] = useState();
+const ingredientsReducer = (currentIngredients, action) => {
+  switch (action.type) {
+    case 'SET':
+      return action.ingredients;
+    case 'ADD':
+      return [...currentIngredients, action.ingredient]
+    case 'DELETE':
+      return currentIngredients.filter(ingredient => ingredient.id !== action.id);
+    default:
+      throw new Error('Should not get here!');
+  }
+}
 
-  /*
-  useEffect(() => { // run after each component render (componentDidMount + componentDiđUpate)
-    fetch('https://react-hooks-update-a8416-default-rtdb.firebaseio.com/ingredients.json')
-      .then(response => response.json())
-      .then(responseData => {
-        const loadedIngredients = [];
-        for (const key in responseData) {
-          loadedIngredients.push({
-            id: key,
-            title: responseData[key].title,
-            amount: responseData[key].amount,
-          });
-        }
-        setUserIngredients(loadedIngredients);
-      });
-  }, []); // nếu dùng một empty array, đây sẽ tương tự với componentDidMount.
-  */
+const httpReducer = (httpState, action) => {
+  switch (action.type) {
+    case 'SEND':
+      return {
+        loading: true,
+        error: null
+      }
+    case 'RESPONSE':
+      return {
+        ...httpState,
+        loading: false
+      }
+    case 'ERROR':
+      return {
+        loading: false,
+        error: action.error
+      }
+    default: throw new Error('Should never get here!!!');
+  }
+}
+
+const Ingredients = () => {
+  const [userIngredients, dispatch] = useReducer(ingredientsReducer, []);
+  const [httpState, dispatchHttpState] = useReducer(httpReducer, { loading: false, error: null});
 
   const addIngredientHandler = ingredient => {
-    setIsloading(true);
+    dispatchHttpState({
+      type: 'SEND'
+    });
     fetch('https://react-hooks-update-a8416-default-rtdb.firebaseio.com/ingredients.json', {
       method: 'POST',
       body: JSON.stringify(ingredient),
       headers: {'Content-Type': 'application/json'}
     }).then(res => {
-      setIsloading(false);
+      dispatchHttpState({
+        type: 'RESPONSE'
+      });
       return res.json(); // return ra một promise
     }).then(resData => {
-      setUserIngredients(prevIngredients => {
-        return [...prevIngredients, {
-          id: resData.name, // sử dụng giá trị mà firebase return về để làm id.
+      dispatch({
+        type: 'ADD',
+        ingredient: {
+          id: resData.name,
           ...ingredient
-        }]
-      });
+        }
+      })
     }).catch(err => {
-      setError(err.message);
+      dispatchHttpState({
+        type: 'ERROR',
+        error: err.message
+      })
     });;
   }
 
   const removeIngredientHandler = id => {
-    setIsloading(true);
+    dispatchHttpState({
+      type: 'SEND'
+    });
     fetch(`https://react-hooks-update-a8416-default-rtdb.firebaseio.com/ingredients/${id}.json/`, {
       method: 'DELETE'
     }).then(res => {
-      setIsloading(false);
-      setUserIngredients(prevIngredients => {
-        const ingredients = prevIngredients.filter(ingredient => {
-          return ingredient.id !== id;
-        });
-        return ingredients;
+      dispatchHttpState({
+        type: 'RESPONSE'
+      });
+      dispatch({
+        type: 'DELETE',
+        id: id
       });
     }).catch(err => {
-      setError(err.message);
-      setIsloading(false);
+      dispatchHttpState({
+        type: 'ERROR',
+        error: err.message
+      });
     });
   }
 
   const filterIngredientsHandler = useCallback(filteredIngredients => {
-    setUserIngredients(filteredIngredients);
+    // setUserIngredients(filteredIngredients);
+    dispatch({
+      type: 'SET',
+      ingredients: filteredIngredients
+    })
   }, []);
 
   const clearError = () => {
-    setError(null);
+    dispatchHttpState({
+      type: 'RESPONSE'
+    });
   }
 
   return (
     <div className="App">
-      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
-      <IngredientForm onAddIngredient={addIngredientHandler} loading={isLoading} />
+      {httpState.error && <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal>}
+      <IngredientForm onAddIngredient={addIngredientHandler} loading={httpState.loading} />
 
       <section>
         <Search onLoadIngredients={filterIngredientsHandler} />
-        <IngredientList ingredients={userIngredients} onRemoveItem={removeIngredientHandler} />
+        <IngredientList
+          ingredients={userIngredients}
+          onRemoveItem={removeIngredientHandler}
+        />
       </section>
     </div>
   );
