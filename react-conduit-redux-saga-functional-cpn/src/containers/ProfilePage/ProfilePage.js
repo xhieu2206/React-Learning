@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { DEFAULTAVATAR } from '../../constants/URL';
@@ -12,193 +12,169 @@ import Spinner from '../../components/UI/Spinner/Spinner';
 import ArticlePreview from '../../components/ArticlePreview/ArticlePreview';
 import Paginations from '../../components/UI/Paginations/Paginations';
 
-class ProfilePage extends React.Component {
-  state = {
-    profile: {},
-    loading: true,
-    feedIndex: 0,
-    articles: [],
-    currentPage: 1,
-    totalPage: 0
-  }
+const ProfilePage = props => {
+  const [profile, setProfile] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [feedIndex, setFeedIndex] = useState(0);
+  const [articles, setArticles] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
 
-  loadData = async _ => {
-    const username = this.props.match.params.slug;
+  const loadData = async _ => {
+    const username = props.match.params.slug;
     const user = new User();
     const article = new Article();
-    const userAwait = await user.getUser(this.props.token, username);
+    const userAwait = await user.getUser(props.token, username);
     if (userAwait.error && userAwait.error === 'Not Found') {
-      this.props.history.replace('/');
+      props.history.replace('/');
     } else {
-      const articlesAwait = await article.getArticles(this.props.token, '', userAwait.profile.username, '', this.state.currentPage);
-      this.setState({
-        loading: false,
-        profile: {...userAwait.profile},
-        articles: [...articlesAwait.articles],
-        totalPage: Math.ceil(articlesAwait.articlesCount / articlesAwait.articles.length)
-      });
+      const articlesAwait = await article.getArticles(props.token, '', userAwait.profile.username, '', currentPage);
+      setLoading(false);
+      setProfile({...userAwait.profile});
+      setArticles([...articlesAwait.articles]);
+      setTotalPage(Math.ceil(articlesAwait.articlesCount / articlesAwait.articles.length))
     }
   }
 
-  async componentDidMount() {
-    this.loadData();
-  }
+  useEffect(async () => {
+    await loadData();
+  }, [props.match.params.slug]);
 
-  async componentDidUpdate() {
-    if (this.props.match.params.slug !== this.state.profile.username) {
-      this.loadData();
-    }
-  }
-
-  followButtonClickedHandler = async _ => {
-    if (!this.props.isLoggedIn) {
-      this.props.history.push('/signin');
+  const followButtonClickedHandler = async () => {
+    if (!props.isLoggedIn) {
+      props.history.push('/signin');
     } else {
-      const type = this.state.profile.following ? 'unfollow' : 'follow';
+      const type = profile.following ? 'unfollow' : 'follow';
       const user = new User();
-      const userAwait = await user.toggleFollowUser(this.props.token, type, this.state.profile.username);
-      const profile = {...userAwait};
-      this.setState({
-        profile: {...profile}
-      });
+      const userAwait = await user.toggleFollowUser(props.token, type, profile.username);
+      const updatedProfile = {...userAwait};
+      setProfile({...updatedProfile});
     }
   }
 
-  editProfileButtonClickedHandler = _ => {
-    this.props.history.push({
+  const editProfileButtonClickedHandler = _ => {
+    props.history.push({
       pathname: '/settings'
     });
   }
 
-  clickedFeedItemHandler = async (feedName, index) => {
+  const clickedFeedItemHandler = async (feedName, index) => {
     const article = new Article();
     let articlesAwait;
-    this.setState({
-      loading: true
-    });
+    setLoading(true);
     if (feedName === 'My Articles') {
-      articlesAwait = await article.getArticles(this.props.token, '', this.state.profile.username, '', 1);
+      articlesAwait = await article.getArticles(props.token, '', profile.username, '', 1);
     } else if (feedName === 'Favorited Articles') {
-      articlesAwait = await article.getArticles(this.props.token, '', '', this.state.profile.username, 1);
+      articlesAwait = await article.getArticles(props.token, '', '', profile.username, 1);
     }
-    this.setState({
-      loading: false,
-      feedIndex: index,
-      articles: [...articlesAwait.articles],
-      currentPage: 1,
-      totalPage: Math.ceil(articlesAwait.articlesCount / articlesAwait.articles.length),
-    });
+    setLoading(false);
+    setFeedIndex(index);
+    setArticles([...articlesAwait.articles]);
+    setCurrentPage(1);
+    setTotalPage(Math.ceil(articlesAwait.articlesCount / articlesAwait.articles.length));
   }
 
-  clickLoveArticleButtonHandler = async (favorited, slug) => {
+  const clickLoveArticleButtonHandler = async (favorited, slug) => {
     const type = favorited ? 'dislike' : 'like';
-    if (!this.props.isLoggedIn) {
-      this.props.history.push({
+    if (!props.isLoggedIn) {
+      props.history.push({
         pathname: '/signin'
       });
     } else {
       const article = new Article();
-      const articles = [...this.state.articles];
+      const updatedArticles = [...articles];
       const articleIndex = articles.findIndex(article => article.slug === slug);
-      articles[articleIndex].favorited = !articles[articleIndex].favorited;
+      updatedArticles[articleIndex].favorited = !updatedArticles[articleIndex].favorited;
       if (type === 'dislike') {
-        articles[articleIndex].favoritesCount += -1;
+        updatedArticles[articleIndex].favoritesCount += -1;
       } else {
-        articles[articleIndex].favoritesCount += 1;
+        updatedArticles[articleIndex].favoritesCount += 1;
       }
-      await article.toggleFavoritedArticle(this.props.token, slug, type);
-      this.setState({
-        articles: [...articles]
-      });
+      await article.toggleFavoritedArticle(props.token, slug, type);
+      setArticles(updatedArticles);
     };
   }
 
-  clickedPageItemHandler = async (page) => {
+  const clickedPageItemHandler = async (page) => {
     const article = new Article();
     let articlesAwait;
-    this.setState({
-      loading: true,
-      currentPage: page,
-    });
-    if (this.state.feedIndex === 0) { // My Articles
-      articlesAwait = await article.getArticles(this.props.token, '', this.state.profile.username, '', page);
+    setLoading(true);
+    setCurrentPage(page);
+    if (feedIndex === 0) { // My Articles
+      articlesAwait = await article.getArticles(props.token, '', profile.username, '', page);
     } else {
-      articlesAwait = await article.getArticles(this.props.token, '', '', this.state.profile.username, page);
+      articlesAwait = await article.getArticles(props.token, '', '', profile.username, page);
     }
-    this.setState({
-      loading: false,
-      articles: [...articlesAwait.articles]
-    });
+    setLoading(false);
+    setArticles([...articlesAwait.articles]);
   }
 
-  render() {
-    let button = <FollowToggleButton
-      following={this.state.profile.following}
-      username={this.state.profile.username}
-      clicked={this.followButtonClickedHandler}
-    />
-    if (this.state.profile.username === this.props.username) {
-      button = <SettingsProfileButton clicked={this.editProfileButtonClickedHandler} />
-    }
+  let button = <FollowToggleButton
+    following={profile.following}
+    username={profile.username}
+    clicked={followButtonClickedHandler}
+  />
+  if (profile.username === props.username) {
+    button = <SettingsProfileButton clicked={editProfileButtonClickedHandler} />
+  }
 
-    return (
-      <div className="profile-page">
-        <div className="user-info">
-          <div className="container">
-            <div className="row">
-              <div className="col-xs-12 col-md-10 offset-md-1">
-                <img src={this.state.profile.image} className="user-img" alt={DEFAULTAVATAR} />
-                <h4>{this.state.profile.username}</h4>
-                <p>{this.state.profile.bio}</p>
-                {button}
-              </div>
-            </div>
-          </div>
-        </div>
-
+  return (
+    <div className="profile-page">
+      <div className="user-info">
         <div className="container">
           <div className="row">
             <div className="col-xs-12 col-md-10 offset-md-1">
-              <FeedItems
-                activeIndex={this.state.feedIndex}
-                username={this.props.username}
-                clicked={this.clickedFeedItemHandler}
-              />
-
-              {this.state.loading ? <Spinner /> : null}
-
-              {this.state.articles.length > 0 && !this.state.loading ? this.state.articles.map(article => {
-                return (
-                  <ArticlePreview
-                    key={article.slug}
-                    slug={article.slug}
-                    image={article.author.image}
-                    author={article.author.username}
-                    createdAt={article.createdAt}
-                    favorited={article.favorited}
-                    favoritesCount={article.favoritesCount}
-                    title={article.title}
-                    description={article.description}
-                    tags={article.tagList}
-                    clickedLoveButton={this.clickLoveArticleButtonHandler}
-                  />
-                )
-              }) : !this.state.loading ?
-                <div className="article-preview"><p>No articles are here ... yet</p></div> :
-                null
-              }
-
-              {this.state.totalPage > 1 && !this.state.loading ? <Paginations
-                totalPage={this.state.totalPage}
-                currentPage={this.state.currentPage}
-                clicked={this.clickedPageItemHandler}
-              /> : null}
+              <img src={profile.image ? profile.image : DEFAULTAVATAR} className="user-img" alt={DEFAULTAVATAR} />
+              <h4>{profile.username}</h4>
+              <p>{profile.bio}</p>
+              {button}
             </div>
           </div>
         </div>
       </div>
-    )
-  }
+
+      <div className="container">
+        <div className="row">
+          <div className="col-xs-12 col-md-10 offset-md-1">
+            <FeedItems
+              activeIndex={feedIndex}
+              username={props.username}
+              clicked={clickedFeedItemHandler}
+            />
+
+            {loading ? <Spinner /> : null}
+
+            {articles.length > 0 && !loading ? articles.map(article => {
+              return (
+                <ArticlePreview
+                  key={article.slug}
+                  slug={article.slug}
+                  image={article.author.image}
+                  author={article.author.username}
+                  createdAt={article.createdAt}
+                  favorited={article.favorited}
+                  favoritesCount={article.favoritesCount}
+                  title={article.title}
+                  description={article.description}
+                  tags={article.tagList}
+                  clickedLoveButton={clickLoveArticleButtonHandler}
+                />
+              )
+            }) : !loading ?
+              <div className="article-preview"><p>No articles are here ... yet</p></div> :
+              null
+            }
+
+            {totalPage > 1 && !loading ? <Paginations
+              totalPage={totalPage}
+              currentPage={currentPage}
+              clicked={clickedPageItemHandler}
+            /> : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 const mapStateToProps = state => {

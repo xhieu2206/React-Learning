@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 
@@ -12,121 +12,115 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import * as actions from '../../store/actions/index';
 import { RESET_UPDATED_SUCCESS } from '../../store/actions/actionTypes';
 
-class Settings extends React.Component {
-  state = {
-    image: '',
-    username: '',
-    bio: '',
-    email: '',
-    password: 'password'
-  }
+const Settings = props => {
+  const [image, setImage] = useState('');
+  const [username, setUsername] = useState('');
+  const [bio, setBio] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('password')
 
-  componentDidMount() {
-    const displayImage = this.props.image ? this.props.image : '';
-    const displayBio = this.props.bio ? this.props.bio : '';
-    this.setState({
-      image: displayImage,
-      username: this.props.username,
-      bio: displayBio,
-      email: this.props.email
-    });
-  }
+  useEffect(async () => {
+    const displayImage = props.image ? props.image : '';
+    const displayBio = props.bio ? props.bio : '';
+    setImage(displayImage);
+    setUsername(props.username);
+    setBio(displayBio);
+    setEmail(props.email);
 
-  componentWillUnmount() {
-    this.props.onUnmount();
-    this.props.onResetUpdatedSuccess();
-  }
+    return () => {
+      props.onUnmount();
+      props.onResetUpdatedSuccess();
+    }
+  }, []);
 
-  submittedFormHandler = async e => {
+  const submittedFormHandler = async e => {
     e.preventDefault();
-    await this.props.onUpdated(this.props.token, this.state.username, this.state.bio, this.state.email, this.state.password, this.state.image);
-    if (this.props.isUpdateSuccess) {
-      this.props.history.replace({
-        pathname: `/users/${this.props.username}`
+    await props.onUpdated(props.token, username, bio, email, password, image);
+    if (props.isUpdateSuccess) {
+      props.history.replace({
+        pathname: `/users/${props.username}`
       });
     }
   }
 
-  logoutButtonClickedHandler = _ => {
-    this.props.onLogout();
-    this.props.history.replace({
+  const logoutButtonClickedHandler = () => {
+    props.onLogout();
+    props.history.replace({
       pathname: '/'
     });
   }
 
-  render() {
-    let errors = null;
-    if (this.props.errors.length) {
-      errors = <ErrorMessages errors={this.props.errors} />
-    }
+  let errors = null;
+  if (props.errors.length) {
+    errors = <ErrorMessages errors={props.errors} />
+  }
 
-    let loading = null;
-    if (this.props.loading) {
-      loading = <LoadingSpinner />
-    }
+  let loading = null;
+  if (props.loading) {
+    loading = <LoadingSpinner />
+  }
 
-    return (
-      <div className="settings-page">
-        <div className="container page">
-          <div className="row">
-            <div className="col-md-6 offset-md-3 col-xs-12">
-              <h1 className="text-xs-center">Your Settings</h1>
+  return (
+    <div className="settings-page">
+      <div className="container page">
+        <div className="row">
+          <div className="col-md-6 offset-md-3 col-xs-12">
+            <h1 className="text-xs-center">Your Settings</h1>
 
-              {errors}
-              {loading}
+            {errors}
+            {loading}
 
-              <form onSubmit={this.submittedFormHandler}>
-                <fieldset>
-                  <Input
-                    type="text"
-                    placeholder="URL of profile picture"
-                    value={this.state.image}
-                    changed={(e) => { this.setState({ image: e.target.value }) }}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Username"
-                    value={this.state.username}
-                    changed={(e) => { this.setState({ username: e.target.value }) }}
-                  />
-                  <Textarea
-                    placeholder="Short bio about you"
-                    value={this.state.bio}
-                    changed={(e) => { this.setState({ bio: e.target.value }) }}
-                  />
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={this.state.email}
-                    changed={(e) => { this.setState({ email: e.target.value }) }}
-                  />
-                  <Input
-                    type="password"
-                    placeholder="New Password"
-                    value={this.state.password}
-                    changed={(e) => { this.setState({ password: e.target.value }) }}
-                  />
-                  <Button
-                    clicked={this.submittedFormHandler}
-                    type="primary"
-                    outline={false}
-                    position="right"
-                  >Update Settings</Button>
-                </fieldset>
-              </form>
-              <hr />
-              <Button
-                clicked={this.logoutButtonClickedHandler}
-                type="danger"
-                outline={true}
-                position="left"
-              >Or click here to logout.</Button>
-            </div>
+            <form onSubmit={submittedFormHandler}>
+              <fieldset>
+                <Input
+                  type="text"
+                  placeholder="URL of profile picture"
+                  value={image}
+                  changed={(e) => { setImage(e.target.value) }}
+                />
+                <Input
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  changed={(e) => { setUsername(e.target.value) }}
+                />
+                <Textarea
+                  placeholder="Short bio about you"
+                  value={bio}
+                  changed={(e) => { setBio(e.target.value) }}
+                />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  changed={(e) => { setEmail(e.target.value) }}
+                />
+                <Input
+                  type="password"
+                  placeholder="New Password"
+                  value={password}
+                  changed={(e) => { setPassword(e.target.value) }}
+                />
+                <Button
+                  clicked={submittedFormHandler}
+                  type="primary"
+                  outline={false}
+                  position="right"
+                >Update Settings</Button>
+              </fieldset>
+            </form>
+            <hr />
+            <Button
+              clicked={logoutButtonClickedHandler}
+              type="danger"
+              outline={true}
+              position="left"
+            >Or click here to logout.</Button>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 const mapDispatchToProps = dispatch => {

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import { Route, Switch, withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -13,30 +13,28 @@ import ProfilePage from './containers/ProfilePage/ProfilePage';
 import ArticleDetailPage from './containers/ArticleDetailPage/ArticleDetailPage';
 import Settings from './containers/Settings/Settings';
 
-class App extends Component {
-  async componentDidMount() {
-    await this.props.onTryToLogin();
-  }
+const App = props => {
+  useEffect(async () => {
+    await props.onTryToLogin();
+  }, []);
 
-  render() {
-    return (
-      <div>
-        <Layout>
-          <Switch>
-            <Route path="/signin" component={SignIn} />
-            <Route path="/signup" component={SignUp} />
-            <Route path="/new-article" render={(props) => <Editor {...props} />} />
-            <Route path="/articles/:slug/edit" render={(props) => (<Editor {...props} />)} />
-            <Route path="/settings" component={Settings} />
-            <Route path="/users/:slug" render={(props) => (<ProfilePage {...props} />)} />
-            <Route path="/articles/:slug" component={ArticleDetailPage} />
-            <Route path="/" exact component={Home} />
-            <Redirect to="/" />
-          </Switch>
-        </Layout>
-      </div>
-    )
-  }
+  return (
+    <div>
+      <Layout>
+        <Switch>
+          <Route path="/signin" component={SignIn} />
+          <Route path="/signup" component={SignUp} />
+          <Route path="/new-article" render={(props) => <Editor {...props} />} />
+          <Route path="/articles/:slug/edit" render={(props) => (<Editor {...props} />)} />
+          <Route path="/settings" component={Settings} />
+          <Route path="/users/:slug" render={(props) => (<ProfilePage {...props} />)} />
+          <Route path="/articles/:slug" component={ArticleDetailPage} />
+          <Route path="/" exact component={Home} />
+          <Redirect to="/" />
+        </Switch>
+      </Layout>
+    </div>
+  )
 }
 
 const mapDispatchToProps = dispatch => {

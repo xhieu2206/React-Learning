@@ -1,30 +1,26 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect } from 'react';
 
 import Aux from '../Auxiliary/Auxiliary';
 
 const authGuard = (WrappedComponent, loggedInRequired) => {
-  return class extends React.Component {
-
-    componentDidMount() {
-      if (!this.props.isLoggedIn && loggedInRequired) {
-        this.props.history.push({
+  return (props) => {
+    useEffect(() => {
+      if (!props.isLoggedIn && loggedInRequired) {
+        props.history.push({
           pathname: '/signin'
         });
-      } else if (this.props.isLoggedIn && !loggedInRequired) {
-        this.props.history.push({
+      } else if (props.isLoggedIn && !loggedInRequired) {
+        props.history.push({
           pathname: '/'
         });
       }
-    }
+    }, []);
 
-    render() {
-      return (
-        <Aux>
-          <WrappedComponent {...this.props} />
-        </Aux>
-      )
-    }
+    return (
+      <Aux>
+        <WrappedComponent {...props} />
+      </Aux>
+    );
   }
 }
 

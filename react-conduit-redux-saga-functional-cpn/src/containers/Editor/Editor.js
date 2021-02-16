@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import authGuard from '../../hoc/AuthGuard/AuthGuard';
 import Article from '../../models/Article';
@@ -10,121 +10,109 @@ import Button from '../../components/UI/Button/Button';
 import ErrorMessages from '../../components/ErrorMessages/ErrorMessages';
 import { connect } from 'react-redux';
 
-class Editor extends React.Component {
-  state = {
-    title: '',
-    description: '',
-    body: '',
-    tagList: [],
-    errors: []
-  }
+const Editor = props => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [body, setBody] = useState('');
+  const [tagList, setTagList] = useState([]);
+  const [errors, setErrors] = useState([]);
 
-  async componentDidMount() {
-    if (this.props.match.path === '/articles/:slug/edit') {
+  useEffect(async () => {
+    if (props.match.path === '/articles/:slug/edit') {
       const article = new Article();
-      const articleAwait = await article.getArticle(this.props.token, this.props.match.params.slug);
-      if (articleAwait.error || (articleAwait.article.author.username !== this.props.username)) {
-        this.props.historty.replace('/');
+      const articleAwait = await article.getArticle(props.token, props.match.params.slug);
+      if (articleAwait.error || (articleAwait.article.author.username !== props.username)) {
+        props.historty.replace('/');
       } else {
-        this.setState({
-          title: articleAwait.article.title,
-          description: articleAwait.article.description,
-          body: articleAwait.article.body,
-          tagList: [...articleAwait.article.tagList]
-        });
+        setTitle(articleAwait.article.title);
+        setDescription(articleAwait.article.description);
+        setBody(articleAwait.article.body);
+        setTagList([...articleAwait.article.tagList]);
       }
     }
-  }
+  }, []);
 
-  changedTagsHandler = e => {
+  const changedTagsHandler = e => {
     let value = e.target.value;
     while (value.search("  ") > -1) {
       value = value.replace("  ", ' ');
     }
-    this.setState({
-      tagList: [...value.split(' ')]
-    });
+    setTagList([...value.split(' ')]);
   }
 
-  submittedFormHandler = async (e) => {
+  const submittedFormHandler = async (e) => {
     e.preventDefault();
     const article = new Article();
-    if (this.props.location.pathname === '/new-article') { // create new article
-      const articleAwait = await article.newArticle(this.props.token, this.state.title, this.state.description, this.state.body, this.state.tagList);
+    if (props.location.pathname === '/new-article') { // create new article
+      const articleAwait = await article.newArticle(props.token, title, description, body, tagList);
       if (articleAwait.errors) {
-        this.setState({
-          errors: [...errorTransform(articleAwait.errors)]
-        });
+        setErrors([...errorTransform(articleAwait.errors)]);
       } else if (articleAwait.article) {
-        this.props.history.replace({
+        props.history.replace({
           pathname: `/articles/${articleAwait.article.slug}`
         });
       }
     } else { // update a article
-      const slug = this.props.match.params.slug;
-      const articleAwait = await article.updateArticle(this.props.token, slug, this.state.title, this.state.description, this.state.body, this.state.tagList);
+      const slug = props.match.params.slug;
+      const articleAwait = await article.updateArticle(props.token, slug, title, description, body, tagList);
       if (articleAwait.errors) {
-        this.setState({
-          errors: [...errorTransform(articleAwait.errors)]
-        });
+        setErrors([...errorTransform(articleAwait.errors)]);
       } else if (articleAwait.article) {
-        this.props.history.replace({
+        props.history.replace({
           pathname: `/articles/${articleAwait.article.slug}`
         });
       }
     }
   }
 
-  render() {
-    let errors = null;
-    if (this.state.errors.length > 0) {
-      errors = <ErrorMessages errors={this.state.errors} />
-    }
+  let errorsDisplay = null;
+  if (errors.length > 0) {
+    errorsDisplay = <ErrorMessages errors={errors} />
+  }
 
-    return (
-      <div className="editor-page">
-        <div className="container page">
-          <div className="row">
-            <div className="col-md-10 offset-md-1 col-xs-12">
-              {errors}
+  return (
+    <div className="editor-page">
+      <div className="container page">
+        <div className="row">
+          <div className="col-md-10 offset-md-1 col-xs-12">
+            {errorsDisplay}
 
-              <form onSubmit={this.submittedFormHandler}>
-                <Input
-                  type="text"
-                  placeholder="Article Title"
-                  value={this.state.title}
-                  changed={(e) => { this.setState({ title: e.target.value }) }}
-                />
-                <Input
-                  type="text"
-                  placeholder="What's this article about?"
-                  value={this.state.description}
-                  changed={(e) => { this.setState({ description: e.target.value }) }}
-                />
-                <Textarea
-                  placeholder="Write your article"
-                  value={this.state.body}
-                  changed={(e) => { this.setState({ body: e.target.value }) }}
-                />
-                <Input
-                  type="text"
-                  placeholder="Enter tags"
-                  value={this.state.tagList.join(' ')}
-                  changed={this.changedTagsHandler}
-                />
-                <Button
-                  clicked={this.submittedFormHandler}
-                  type="primary"
-                  outline={false}
-                  position="right"
-                >Publish Article</Button>
-              </form>
-            </div>
+            <form onSubmit={submittedFormHandler}>
+              <Input
+                type="text"
+                placeholder="Article Title"
+                value={title}
+                changed={(e) => { setTitle(e.target.value) }}
+              />
+              <Input
+                type="text"
+                placeholder="What's this article about?"
+                value={description}
+                changed={(e) => { setDescription(e.target.value) }}
+              />
+              <Textarea
+                placeholder="Write your article"
+                value={body}
+                changed={(e) => { setBody(e.target.value) }}
+              />
+              <Input
+                type="text"
+                placeholder="Enter tags"
+                value={tagList.join(' ')}
+                changed={changedTagsHandler}
+              />
+              <Button
+                clicked={submittedFormHandler}
+                type="primary"
+                outline={false}
+                position="right"
+              >Publish Article</Button>
+            </form>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  );
 }
 
 const mapStateToProps = state => {

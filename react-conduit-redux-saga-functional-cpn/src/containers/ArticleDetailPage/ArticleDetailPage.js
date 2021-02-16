@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -19,8 +19,8 @@ import Article from '../../models/Article';
 import Comment from '../../models/Comment';
 import User from '../../models/User';
 
-class ArticleDetailPage extends React.Component {
-  state = {
+const ArticleDetailPage = props => {
+  const [articleDetail, setArticleDetail] = useState({
     author: {},
     body: '',
     createdAt: '',
@@ -30,24 +30,24 @@ class ArticleDetailPage extends React.Component {
     slug: '',
     tagList: [],
     title: '',
-    updatedAt: '',
-    comments: [],
-    commentForm: {
-      body: '',
-      errors: []
-    }
-  }
+    updatedAt: ''
+  });
+  const [comments, setComments] = useState([]);
+  const [commentForm, setCommentForm] = useState({
+    body: '',
+    errors: []
+  });
 
-  async componentDidMount() {
+  useEffect(async () => {
     const article = new Article();
     const comment = new Comment();
-    const slug = this.props.match.params.slug;
-    const articleAwait = await article.getArticle(this.props.token, slug);
-    const commentsAwait = await comment.getComments(this.props.token, slug);
+    const slug = props.match.params.slug;
+    const articleAwait = await article.getArticle(props.token, slug);
+    const commentsAwait = await comment.getComments(props.token, slug);
     if (articleAwait.error === 'Not Found') {
-      this.props.history.replace("/");
+      props.history.replace("/");
     } else {
-      this.setState({
+      setArticleDetail({
         author: {...articleAwait.article.author},
         body: articleAwait.article.body,
         createdAt: articleAwait.article.createdAt,
@@ -57,187 +57,193 @@ class ArticleDetailPage extends React.Component {
         slug: articleAwait.article.slug,
         tagList: [...articleAwait.article.tagList],
         title: articleAwait.article.title,
-        updatedAt: articleAwait.article.updatedAt,
-        comments: [...commentsAwait.comments]
+        updatedAt: articleAwait.article.updatedAt
       });
+      setComments([...commentsAwait.comments]);
     }
-  }
+  }, []);
 
-  addCommentHandler = async e => {
+  const addCommentHandler = async e => {
     e.preventDefault();
     const comment = new Comment();
-    const commentAwait = await comment.addComment(this.props.token, this.state.slug, this.state.commentForm.body);
+    const commentAwait = await comment.addComment(props.token, articleDetail.slug, commentForm.body);
 
     if (commentAwait.errors) {
-      const commentForm = {
+      setCommentForm({
         body: '',
         errors: [...errorTransform(commentAwait.errors)]
-      }
-      this.setState({
-        commentForm: {...commentForm}
       });
     } else {
-      const commentForm = {
+      setCommentForm({
         body: '',
         errors: []
-      };
-      let comments = [...this.state.comments];
-      comments.unshift(commentAwait.comment);
-      this.setState({
-        commentForm: commentForm,
-        comments: comments
       });
+      let newComments = [...comments];
+      newComments.unshift(commentAwait.comment);
+      setComments(newComments);
     }
   }
 
-  deleteCommentHandler = async commentId => {
+  const deleteCommentHandler = async commentId => {
     const comment = new Comment();
-    await comment.deleteComment(this.props.token, this.state.slug, commentId);
-    const comments = [...this.state.comments];
-    const deletedCommentIndex = comments.findIndex(cmt => cmt.id === commentId);
-    comments.splice(deletedCommentIndex, 1);
-    this.setState({
-      comments: [...comments]
-    });
+    await comment.deleteComment(props.token, articleDetail.slug, commentId);
+    const newComments = [...comments];
+    const deletedCommentIndex = newComments.findIndex(cmt => cmt.id === commentId);
+    newComments.splice(deletedCommentIndex, 1);
+    setComments(newComments);
   }
 
-  followButtonClickedHandler = async _ => {
-    if (!this.props.isLoggedIn) {
-      this.props.history.push('/signin');
+  const followButtonClickedHandler = async _ => {
+    if (!props.isLoggedIn) {
+      props.history.push('/signin');
     } else {
-      const type = this.state.author.following ? 'unfollow' : 'follow';
+      const type = articleDetail.author.following ? 'unfollow' : 'follow';
       const user = new User();
-      const userAwait = await user.toggleFollowUser(this.props.token, type, this.state.author.username);
+      const userAwait = await user.toggleFollowUser(props.token, type, articleDetail.author.username);
       const author = {...userAwait};
-      this.setState({
-        author: {...author}
+      setArticleDetail((prevArticleDetail) => {
+        return {
+          author: {...author},
+          body: prevArticleDetail.body,
+          createdAt: prevArticleDetail.createdAt,
+          description: prevArticleDetail.description,
+          favorited: prevArticleDetail.favorited,
+          favoritesCount: prevArticleDetail.favoritesCount,
+          slug: prevArticleDetail.slug,
+          tagList: [...prevArticleDetail.tagList],
+          title: prevArticleDetail.title,
+          updatedAt: prevArticleDetail.updatedAt
+        }
       });
     }
   }
 
-  favoritedButtonClickedHandler = async _ => {
+  const favoritedButtonClickedHandler = async () => {
     const article = new Article();
-    const type = this.state.favorited ? "dislike" : "like";
-    const articleAwait = await article.toggleFavoritedArticle(this.props.token, this.state.slug, type);
-    this.setState({
-      favoritesCount: articleAwait.favoritesCount,
-      favorited: articleAwait.favorited
+    const type = articleDetail.favorited ? "dislike" : "like";
+    const articleAwait = await article.toggleFavoritedArticle(props.token, articleDetail.slug, type);
+    setArticleDetail((prevArticleDetail) => {
+      return {
+        ...prevArticleDetail,
+        favoritesCount: articleAwait.favoritesCount,
+        favorited: articleAwait.favorited,
+      }
     });
   }
 
-  deleteArticleButtonClcikedHandler = async _ => {
+  const deleteArticleButtonClcikedHandler = async _ => {
     const article = new Article();
-    const deletedArticleAwait = await article.deleteArticle(this.props.token, this.state.slug);
+    const deletedArticleAwait = await article.deleteArticle(props.token, articleDetail.slug);
     if (!deletedArticleAwait) {
-      this.props.history.replace("/");
+      props.history.replace("/");
     }
   }
 
-  render() {
-    let buttons = (
+  let buttons = (
+    <Aux>
+      <FollowToggleButton
+        following={articleDetail.author.following}
+        username={articleDetail.author.username}
+        clicked={followButtonClickedHandler}/>
+      &nbsp;&nbsp;
+      <FavoritedToggleButton
+        favorited={articleDetail.favorited}
+        favoritesCount={articleDetail.favoritesCount}
+        clicked={favoritedButtonClickedHandler} />
+    </Aux>
+  );
+  if (props.username === articleDetail.author.username) {
+    buttons = (
       <Aux>
-        <FollowToggleButton
-          following={this.state.author.following}
-          username={this.state.author.username}
-          clicked={this.followButtonClickedHandler}/>
-        &nbsp;&nbsp;
-        <FavoritedToggleButton
-          favorited={this.state.favorited}
-          favoritesCount={this.state.favoritesCount}
-          clicked={this.favoritedButtonClickedHandler} />
+        <EditArticleButton
+          slug={articleDetail.slug}
+        />&nbsp;&nbsp;
+        <DeleteArticleButton
+          clicked={deleteArticleButtonClcikedHandler}
+        />
       </Aux>
-    );
-    if (this.props.username === this.state.author.username) {
-      buttons = (
-        <Aux>
-          <EditArticleButton
-            slug={this.state.slug}
-          />&nbsp;&nbsp;
-          <DeleteArticleButton
-            clicked={this.deleteArticleButtonClcikedHandler}
-          />
-        </Aux>
-      )
-    }
+    )
+  }
 
-    let commentForm = <p style={{ display: 'inherit' }}>
-      <Link to="/signin">Sign in</Link> or <Link to="/signup">sign up</Link> to add comments on this article
-    </p>
-    let commentErrors = null;
-    if (this.state.commentForm.errors.length > 0) {
-      commentErrors = <ErrorMessages errors={this.state.commentForm.errors} />
-    }
-    if (this.props.isLoggedIn) {
-      commentForm = (
-        <Aux>
-          {commentErrors}
+  let form = <p style={{ display: 'inherit' }}>
+    <Link to="/signin">Sign in</Link> or <Link to="/signup">sign up</Link> to add comments on this article
+  </p>
+  let commentErrors = null;
+  if (commentForm.errors.length > 0) {
+    commentErrors = <ErrorMessages errors={commentForm.errors} />
+  }
+  if (props.isLoggedIn) {
+    form = (
+      <Aux>
+        {commentErrors}
 
-          <CommentForm
-            value={this.state.commentForm.body}
-            changed={(e) => {
-              let commentForm = {...this.state.commentForm};
-              commentForm.body = e.target.value;
-              this.setState({
-                commentForm: {...commentForm}
-              });
-            }}
-            clicked={this.addCommentHandler}
-          />
-        </Aux>
-      )
-    }
+        <CommentForm
+          value={commentForm.body}
+          changed={(e) => {
+            const body = e.target.value;
+            setCommentForm(prevCommentForm => {
+              return {
+                body: body,
+                errors: [...prevCommentForm.errors]
+              }
+            });
+          }}
+          clicked={addCommentHandler}
+        />
+      </Aux>
+    )
+  }
 
-    return (
-      <div className="article-page">
-        <div className="banner">
-          <div className="container">
-            <h1>{this.state.title}</h1>
-            <div className="article-meta">
-              <FeedAuthor
-                image={this.state.author.image}
-                author={this.state.author.username}
-                createdAt={this.state.createdAt}
-              />
-              {buttons}
-            </div>
-          </div>
-        </div>
-
-        <div className="container page">
-          <div className="row article-content">
-            <div className="col-md-12">
-              <p>{this.state.body}</p>
-              <Tags tags={this.state.tagList} />
-            </div>
-          </div>
-
-          <hr />
-
-          <div className="article-actions">
-            <div className="article-meta">
-              <FeedAuthor
-                image={this.state.author.image}
-                author={this.state.author.username}
-                createdAt={this.state.createdAt}
-              />
-              {buttons}
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col-xs-12 col-md-8 offset-md-2">
-              {commentForm}
-
-              <CommentsSection
-                clicked={this.deleteCommentHandler}
-                comments={this.state.comments}
-              />
-            </div>
+  return (
+    <div className="article-page">
+      <div className="banner">
+        <div className="container">
+          <h1>{articleDetail.title}</h1>
+          <div className="article-meta">
+            <FeedAuthor
+              image={articleDetail.author.image}
+              author={articleDetail.author.username}
+              createdAt={articleDetail.createdAt}
+            />
+            {buttons}
           </div>
         </div>
       </div>
-    )
-  }
+
+      <div className="container page">
+        <div className="row article-content">
+          <div className="col-md-12">
+            <p>{articleDetail.body}</p>
+            <Tags tags={articleDetail.tagList} />
+          </div>
+        </div>
+
+        <hr />
+
+        <div className="article-actions">
+          <div className="article-meta">
+            <FeedAuthor
+              image={articleDetail.author.image}
+              author={articleDetail.author.username}
+              createdAt={articleDetail.createdAt}
+            />
+            {buttons}
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-xs-12 col-md-8 offset-md-2">
+            {form}
+
+            <CommentsSection
+              clicked={deleteCommentHandler}
+              comments={comments}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 const mapStateToProps = state => {

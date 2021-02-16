@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -9,91 +9,85 @@ import LoadingSpinner  from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import authGuard from '../../hoc/AuthGuard/AuthGuard'
 import * as actions from '../../store/actions/index';
 
-class SignIn extends React.Component {
-  state = {
-    email: '',
-    password: ''
+const SignIn = props => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    return () => {
+      props.onUnmount();
+    }
+  }, []);
+
+  const emailChangedHandler = e => {
+    setEmail(e.target.value);
   }
 
-  componentWillUnmount() {
-    this.props.onUnmount();
+  const passwordChangedHandler = e => {
+    setPassword(e.target.value);
   }
 
-  emailChangedHandler = e => {
-    this.setState({
-      email: e.target.value
-    });
-  }
-
-  passwordChangedHandler = e => {
-    this.setState({
-      password: e.target.value
-    });
-  }
-
-  login = async e => {
+  const login = async e => {
     e.preventDefault();
-    await this.props.onLogin(this.state.email, this.state.password);
+    await props.onLogin(email, password);
   }
 
-  render() {
-    let errors = null;
-    if (this.props.errors.length > 0) {
-      errors = <ErrorMessages errors={this.props.errors} />
-    }
+  let errors = null;
+  if (props.errors.length > 0) {
+    errors = <ErrorMessages errors={props.errors} />
+  }
 
-    let redirect = null;
-    if (this.props.isLoggedIn) {
-      redirect = <Redirect to="/" />
-    }
+  let redirect = null;
+  if (props.isLoggedIn) {
+    redirect = <Redirect to="/" />
+  }
 
-    let loading = null;
-    if (this.props.loading) {
-      loading = <LoadingSpinner />
-    }
+  let loading = null;
+  if (props.loading) {
+    loading = <LoadingSpinner />
+  }
 
-    return (
-      <div className="auth-page">
-        <div className="container page">
-          <div className="row">
-            <div className="col-md-6 offset-md-3 col-xs-12">
-              <h1 className="text-xs-center">Sign in</h1>
-              <p className="text-xs-center">
-                <Link to="/signup">
-                  Need an account?
-                </Link>
-              </p>
+  return (
+    <div className="auth-page">
+      <div className="container page">
+        <div className="row">
+          <div className="col-md-6 offset-md-3 col-xs-12">
+            <h1 className="text-xs-center">Sign in</h1>
+            <p className="text-xs-center">
+              <Link to="/signup">
+                Need an account?
+              </Link>
+            </p>
 
-              {redirect}
-              {errors}
-              {loading}
+            {redirect}
+            {errors}
+            {loading}
 
-              <form>
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={this.state.email}
-                  changed={this.emailChangedHandler} />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={this.state.password}
-                  changed={this.passwordChangedHandler} />
-                <Button
-                  type="primary"
-                  position="right"
-                  outline={false}
-                  clicked={this.login}
-                >
-                  Sign in
-                </Button>
-              </form>
-            </div>
+            <form>
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                changed={emailChangedHandler} />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                changed={passwordChangedHandler} />
+              <Button
+                type="primary"
+                position="right"
+                outline={false}
+                clicked={login}
+              >
+                Sign in
+              </Button>
+            </form>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 const mapStateToProps = state => {
