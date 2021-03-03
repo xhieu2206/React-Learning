@@ -1,5 +1,5 @@
 .Toolbar {
-  height: 56px;
+  height: 50px;
   width: 100%;
   position: fixed;
   top: 0;
@@ -24,6 +24,12 @@
 /* Hiding the toolbar when using mobile screen */
 @media (max-width: 499px) {
   .DesktopOnly {
+    display: none;
+  }
+}
+
+@media (min-width: 500px) {
+  .MobileOnly {
     display: none;
   }
 }

@@ -7,7 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 /* redux configuration */
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
 
 // for redux saga
 import createSagaMiddleware from 'redux-saga';
