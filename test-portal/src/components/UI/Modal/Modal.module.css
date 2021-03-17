@@ -1,0 +1,14 @@
+.Modal {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+}
+
+.ModalContent {
+  background-color: white;
+  flex-basis: 50%;
+  border: 1px solid black;
+  color: black;
+}
