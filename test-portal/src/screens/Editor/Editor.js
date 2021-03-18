@@ -16,6 +16,10 @@ const Editor = props => {
   const [errors, setErrors] = React.useState([]);
 
   React.useEffect(() => {
+
+  }, []);
+
+  React.useEffect(() => {
     async function loadPosts() {
       const postId = props.match.params.postId;
       if (props.match.path === '/posts/:postId/edit') {
@@ -30,6 +34,9 @@ const Editor = props => {
           });
           setErrors(errorArr);
         }
+      } else {
+        setTitle('');
+        setContent('');
       }
     }
 
@@ -126,4 +133,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(AuthGuard(Editor, true)));
+export default withRouter(connect(mapStateToProps, null)(AuthGuard(Editor, true)));

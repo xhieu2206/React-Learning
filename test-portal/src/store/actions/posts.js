@@ -25,3 +25,9 @@ export const loadPostsSuccess = posts => {
     posts: posts
   }
 }
+
+export const removeErrors = () => {
+  return {
+    type: actionTypes.REMOVE_ERRORS
+  }
+}

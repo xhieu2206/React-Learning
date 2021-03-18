@@ -77,6 +77,18 @@ const useStyles = makeStyles((theme) => ({
     }),
     marginRight: 0,
   },
+  navLink: {
+    textDecoration: 'none',
+    color: 'black'
+  },
+  active: {
+    '& div': {
+      backgroundColor: '#c6c6c6'
+    }
+  },
+  text: {
+    padding: '10px'
+  }
 }));
 
 const Layout = props => {
@@ -145,28 +157,44 @@ const Layout = props => {
         </div>
         <Divider />
         <List>
-          <NavLink to="/posts" style={{ textDecoration: 'none', color: 'black' }}>
-            <ListItem button><ListItemText primary={'Posts'}>Post</ListItemText></ListItem>
+          <NavLink to="/posts" exact className={classes.navLink} activeClassName={classes.active}>
+            <ListItem button>
+              <ListItemText className={classes.text} primary={'Posts'}>
+                Post
+              </ListItemText>
+            </ListItem>
           </NavLink>
           {props.isLoggedIn ?
             <>
-              <NavLink to="/posts/new" style={{ textDecoration: 'none', color: 'black' }}>
-                <ListItem button><ListItemText primary={'New Post'}>New Post</ListItemText></ListItem>
+              <NavLink to="/posts/new" className={classes.navLink} activeClassName={classes.active}>
+                <ListItem button>
+                  <ListItemText className={classes.text} primary={'New Post'}>
+                    New Post
+                  </ListItemText>
+                </ListItem>
               </NavLink>
             </> :
             <>
-              <NavLink to="/auth/login" style={{ textDecoration: 'none', color: 'black' }}>
-                <ListItem button><ListItemText primary={'Login'}>Login</ListItemText></ListItem>
+              <NavLink to="/auth/login" className={classes.navLink} activeClassName={classes.active}>
+                <ListItem button>
+                  <ListItemText className={classes.text} primary={'Login'}>
+                    Login
+                  </ListItemText>
+                </ListItem>
               </NavLink>
-              <NavLink to="/auth/signup" style={{ textDecoration: 'none', color: 'black' }}>
-                <ListItem button><ListItemText primary={'Sign Up'}>Sign Up</ListItemText></ListItem>
+              <NavLink to="/auth/signup" className={classes.navLink} activeClassName={classes.active}>
+                <ListItem button>
+                  <ListItemText className={classes.text} primary={'Sign Up'}>
+                    Sign Up
+                  </ListItemText>
+                </ListItem>
               </NavLink>
             </>
           }
         </List>
         <Divider />
         {props.isLoggedIn && <ListItem button>
-          <ListItemText onClick={() => onClickedLogoutHandler()} primary={'Logout'}>
+          <ListItemText className={classes.text} onClick={() => onClickedLogoutHandler()} primary={'Logout'}>
             Logout
           </ListItemText>
         </ListItem>}

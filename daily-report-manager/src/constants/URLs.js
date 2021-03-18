@@ -1,1 +1,1 @@
-export const ENTRYPOINT = 'https://projectshelper.azurewebsites.net';
+export const ENTRYPOINT = 'https://projecthelper.azurewebsites.net';

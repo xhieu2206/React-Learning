@@ -13,7 +13,7 @@ const Auth = props => {
   const [isLogin, setIsLogin] = React.useState(true);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const { history } = props;
+  const { history, onRemoveErrors } = props;
 
   React.useEffect(() => {
     if (props.location.pathname === '/auth/signup') {
@@ -30,6 +30,12 @@ const Auth = props => {
       });
     }
   }, [props.isLoggedIn, history]);
+
+  React.useEffect(() => {
+    return () => {
+      onRemoveErrors();
+    }
+  }, [onRemoveErrors])
 
   const submittedHandler = async () => {
     if (props.location.pathname === '/auth/signup') {
@@ -97,7 +103,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     onSignUp: (email, password) => dispatch(authActions.signUp(email, password)),
-    onSignIn: (email, password) => dispatch(authActions.signIn(email, password))
+    onSignIn: (email, password) => dispatch(authActions.signIn(email, password)),
+    onRemoveErrors: () => dispatch(authActions.removeErrors())
   }
 }
 

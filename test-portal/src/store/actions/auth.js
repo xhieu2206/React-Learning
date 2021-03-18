@@ -50,3 +50,9 @@ export const tryLogin = (token, email) => {
     email: email
   }
 }
+
+export const removeErrors = () => {
+  return {
+    type: actionTypes.REMOVE_ERRORS
+  }
+}

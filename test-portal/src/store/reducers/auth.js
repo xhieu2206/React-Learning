@@ -49,6 +49,11 @@ const reducer = (state = initState, action) => {
         email: action.email,
         isLoggedIn: true
       }
+    case actionTypes.REMOVE_ERRORS:
+      return {
+        ...state,
+        errors: []
+      }
     default:
       return state;
   }

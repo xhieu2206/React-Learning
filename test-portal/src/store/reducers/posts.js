@@ -26,6 +26,11 @@ const reducer = (state = initialState, action) => {
         errors: [],
         posts: [...action.posts]
       }
+    case actionTypes.REMOVE_ERRORS:
+      return {
+        ...state,
+        errors: []
+      }
     default:
       return state;
   }

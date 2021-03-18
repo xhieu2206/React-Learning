@@ -12,3 +12,4 @@ export const SIGN_IN = 'SIGN_IN';
 export const LOGOUT = 'LOGOUT'
 
 export const TRY_LOGIN = 'TRY_LOGIN';
+export const REMOVE_ERRORS = 'REMOVE_ERRORS';
